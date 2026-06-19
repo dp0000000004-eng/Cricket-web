@@ -1,0 +1,9 @@
+{% extends 'pl/layout.html' %}
+
+{% block body %}
+    <ul>
+        {% for team in teams %}
+        <a href="{% url 'player_view' team.id %}"><li>{{ team.team_name }}</li></a>
+        {% endfor %}
+    </ul>
+{% endblock %}

@@ -1,0 +1,12 @@
+{% extends 'pl/layout.html' %}
+
+{% block body %}
+    {% for match in matches %}
+        <div class="match-card">
+            <h1>{{ match.team1 }} VS {{ match.team2 }}</h1>
+            <h4>Date:  {{ match.date_time|date:"d.m.y" }}</h4>
+            <h5>Time: {{ match.date_time|time:"H.i" }}</h5>
+            <h4>Venue: {{ match.venue }}</h4>
+        </div>
+    {% endfor %}
+{% endblock %}

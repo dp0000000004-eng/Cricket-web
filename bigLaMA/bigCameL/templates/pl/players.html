@@ -1,0 +1,19 @@
+{% extends 'pl/layout.html' %}
+
+{% block body %}
+    <ul>
+    {% for player in players %}
+    <li>
+        <span class="jersey">#{{ player.jersey_no }}</span>
+        <span class="name">{{ player.player_name }}</span>
+        <span class="type">{{ player.code }}</span>
+        {% if player.is_captain %}
+        <span class="tag captain">C</span>
+        {% endif %}
+        {% if player.is_overseas %}
+        <span class="tag overseas">OS</span>
+        {% endif %}
+    </li>
+    {% endfor %}
+    </ul>
+{% endblock %}

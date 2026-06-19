@@ -1,0 +1,28 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>
+            Login
+        </title>
+        <link rel="stylesheet" href="{% static 'login.css' %}">
+    </head>
+    <body>
+    {% if messages %}
+        {% for message in messages %}
+            <p>{{ message }}</p>
+        {% endfor %}
+    {% endif %}
+    <div class="form-c">
+        <form method="POST">
+            {% csrf_token %}
+            <lable class="lbl-cls">Username: </lable><br>
+            <input class="input-cls" type="text" name="username" placeholder="Username"><br>
+            <lable class="lbl-cls">Password: </lable><br>
+            <input class="input-cls" type="password" name="password" placeholder="password"><br>
+            <input class="login-btn" type="submit" placeholder="Login">
+        </form>
+    </div>
+  </body>
+</html>

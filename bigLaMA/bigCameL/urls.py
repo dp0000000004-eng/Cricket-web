@@ -1,0 +1,11 @@
+from django.urls import path
+from . import views
+
+
+urlpatterns = [
+    path("", views.login_view, name="login"),
+    path("home/", views.home, name="home"),
+    path("teams/", views.team_view, name="team_view"),
+    path("players/<int:team_id>/", views.player_view, name="player_view"),
+    path("matches/", views.matches_view, name="match_view"),
+]
