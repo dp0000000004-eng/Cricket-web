@@ -1,5 +1,3 @@
-import "./front_img.js"
-
 
 const navHome = document.getElementById("nav-home")
 const navTeams = document.getElementById("nav-teams")

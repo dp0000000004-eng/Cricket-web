@@ -1,0 +1,35 @@
+
+.slider {
+    position:relative;
+    padding-left:10px;
+    padding-top:10px;
+    padding-right:20px;
+    width:60%;
+    overflow: hidden;
+}
+
+.slider img {
+    width:100%;
+    display:none;
+}
+
+img.displaySlide  {
+    display:block;
+}
+
+.slides button {
+    background-color: #4A5D8A;   /* matches your site’s theme */
+    color: white;
+    border: none;
+    padding: 12px 18px;
+    margin: 0 10px;
+    font-size: 24px;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.2s;
+}
+
+.slides button:hover {
+    background-color: #FF7F50;   /* orange hover to match IPL button */
+    transform: scale(1.1);
+}

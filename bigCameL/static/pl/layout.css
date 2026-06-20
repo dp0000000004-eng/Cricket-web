@@ -1,0 +1,62 @@
+
+
+.layout {
+    display: flex;
+    flex-direction: column; /* This forces the sidebar to the top */
+    min-height: 100vh;
+}
+
+.sidebar {
+    width: 100%;
+    padding: 15px 50px;
+    background: rgba(255, 255, 255, 0.4);
+    backdrop-filter: blur(12px); /* Glass/Water effect */
+    -webkit-backdrop-filter: blur(12px);
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.6);
+}
+
+.sidebar-logo {
+    font-size: 2rem;
+    font-weight: 800;
+    color: #1a73e8;
+    margin: 0;
+    text-shadow: 0 4px 10px rgba(26, 115, 232, 0.2);
+}
+
+.sidebar-nav {
+    display: flex;
+    flex-direction: row; /* Horizontal links */
+    gap: 15px;
+}
+
+.nav-item {
+    display: block;
+    padding: 10px 24px;
+    color: #5f6368;
+    text-decoration: none;
+    font-size: 1rem;
+    font-weight: 600;
+    border-radius: 5px; /* Pill shape */
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+.nav-item:hover {
+    background: rgba(255, 255, 255, 0.8);
+    color: #1a73e8;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    transform: translateY(-2px);
+}
+
+.nav-item.active {
+    background: rgba(255, 255, 255, 0.8);
+    color: #1a73e8;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    transform: translateY(-2px);
+}
