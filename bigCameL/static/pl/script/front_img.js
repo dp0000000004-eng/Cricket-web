@@ -3,7 +3,7 @@ const prevBtn = document.getElementById("prev")
 const nextBtn = document.getElementById("next")
 const frontImg = document.querySelectorAll("img")
 let slideIndex = 0
-let autoPlay 
+let intervalId = 0 
 
 intilaizer(frontImg)
 
@@ -21,7 +21,7 @@ prevBtn.addEventListener("click", function() {
 })
 
 
-nextBtn.addEventListener("click", function() {
+nextBtn.addEventListener("click", function () {
     frontImg[slideIndex].classList.remove("displaySlide")
     slideIndex++
     
@@ -33,9 +33,14 @@ nextBtn.addEventListener("click", function() {
 
 
 function startAutoPlay(){
-    autoPlay = setInterval(() => {
-        (slideIndex + 1 ) % frontImg.length
-        intilaizer(frontImg)
+    setInterval(() => {
+        frontImg[slideIndex].classList.remove("displaySlide")
+        slideIndex++
+    
+        if (slideIndex > (frontImg.length - 1)){
+            slideIndex = 0
+        }
+    intilaizer(frontImg)
     }, 3000)
 
 }
