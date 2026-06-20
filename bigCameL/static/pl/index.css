@@ -171,6 +171,20 @@ a {
 .overseas { background-color: rgba(26, 115, 232, 0.15); color: #1a73e8; }
 
 
-.slide-img {
+.slider {
+    position:relative;
+    padding-left:10px;
+    padding-top:10px;
+    width:60%;
+    overflow: hidden;
+}
+
+.slider img {
+    width:100%;
+    display:none;
+}
+
+img.displaySlide  {
     display:block;
 }
+
