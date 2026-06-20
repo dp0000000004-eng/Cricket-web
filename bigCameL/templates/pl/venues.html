@@ -1,3 +1,9 @@
 {% extends 'pl/layout.html' %}
 
-{}
+{% block body %}
+    <ul>
+    {% for venue in venues %}
+        <a href="#"><li>{{ venue }}</li></a>
+    {% endfor %}
+    </ul>
+{% endblock %}

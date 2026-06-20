@@ -6,16 +6,17 @@
         <title>
             Home
         </title>
-        <link rel="stylesheet" href="{% static 'css/index.css' %}">
+        <link rel="stylesheet" href="{% static 'pl/index.css' %}">
     </head>
     <body>
         <div class="layout">
         <aside class="sidebar">
             <div class="sidebar-logo"> IPL</div>
             <nav class="sidebar-nav">
-            <a href="{% url 'home' %}" class="nav-item " id="nav-home ">Home</a>
+            <a href="{% url 'home' %}" class="nav-item" id="nav-home">Home</a>
             <a href="{% url 'team_view' %}" class="nav-item " id="nav-teams">Teams</a>
             <a href="{% url 'match_view' %}" class="nav-item " id="nav-matches">Matches</a>
+            <a href="{% url 'venue_view' %}" class="nav-item " id="nav-venue">Venues</a>
             </nav>
         </aside>
         <div class="main">
@@ -29,6 +30,6 @@
             </div>
         </div>
         </div>
-        <script src="{% static 'js/nav-active.js' %}"></script>
+        <script type="module" src="{% static 'pl/script/nav_active.js' %}"></script>
     </body>
 </html>

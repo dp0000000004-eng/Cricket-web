@@ -169,3 +169,8 @@ a {
 }
 .captain { background-color: rgba(251, 185, 0, 0.2); color: #d69e00; }
 .overseas { background-color: rgba(26, 115, 232, 0.15); color: #1a73e8; }
+
+
+.slide-img {
+    display:block;
+}

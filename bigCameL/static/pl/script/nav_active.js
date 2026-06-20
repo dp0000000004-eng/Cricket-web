@@ -1,11 +1,16 @@
-addEventListener("DOMContentLoaded", function() {
-    const navHome = document.getElementById("nav-home")
-    const navTeams = document.getElementById("nav-teams")
-    const navMatchs = document.getElementById("nav-matches")
+import "./front_img.js"
 
+
+const navHome = document.getElementById("nav-home")
+const navTeams = document.getElementById("nav-teams")
+const navMatchs = document.getElementById("nav-matches")
+
+
+
+addEventListener("DOMContentLoaded", function() {
 
     navHome.addEventListener("click" , function() {
-        navHome.classList.add(" active")
+        navHome.classList.add("active")
         navTeams.classList.remove("active")
         navMatchs.classList.remove("active")
     })
