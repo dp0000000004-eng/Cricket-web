@@ -1,0 +1,13 @@
+{% extends 'pl/layout.html' %}
+
+{% block body %}
+    {% if about_venues %}
+        {% for venue in about_venues %}
+            <h4>Stadium Capacity: {{ venue.venue_people_capa }}</h4>
+            <h4>Ground Width: {{ venue.venue_width }}M</h4>
+            <p>
+                {{ venue.description }}
+            </p>
+        {% endfor %}
+    {% endif %}
+{% endblock %}

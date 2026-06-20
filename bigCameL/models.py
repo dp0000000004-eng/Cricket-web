@@ -58,3 +58,14 @@ class Matches(models.Model):
 
     def __str__(self):
         return f"{self.team1} {self.team2} {self.venue} {self.home_of} {self.city} {self.city}"
+    
+
+class About_venue(models.Model):
+    venue_name = models.ForeignKey(Venues, on_delete=models.CASCADE, related_name="stadium_name")
+    venue_people_capa = models.IntegerField()
+    venue_width = models.IntegerField()
+    description = models.CharField(max_length=1000)
+    pic = models.ImageField(blank= True, null=True)
+
+    def __str__(self):
+        return f"{self.venue_people_capa} {self.venue_width} {self.description} {self.pic}"

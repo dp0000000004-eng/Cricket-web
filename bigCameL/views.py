@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect
-from .models import Teams, Players, Matches, Venues
+from .models import Teams, Players, Matches, Venues, About_venue
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
 from django.http import HttpResponseRedirect
@@ -36,6 +36,9 @@ def login_view(request):
 def home(request):
     return render(request, "pl/home.html")
 
+def about_venue(request, venue_id):
+    about_venues = About_venue.objects.filter(id=venue_id)
+    return render(request, "pl/about_venue.html", {"about_venues":about_venues})
 
 def matches_view(request):
     matches = Matches.objects.all()
@@ -44,3 +47,4 @@ def matches_view(request):
 def venue_view(request):
     venues = Venues.objects.all()
     return render(request, "pl/venues.html", {"venues":venues})
+
