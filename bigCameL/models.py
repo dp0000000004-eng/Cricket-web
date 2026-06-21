@@ -65,7 +65,31 @@ class About_venue(models.Model):
     venue_people_capa = models.IntegerField()
     venue_width = models.IntegerField()
     description = models.CharField(max_length=1000)
-    pic = models.ImageField(blank= True, null=True)
 
     def __str__(self):
-        return f"{self.venue_people_capa} {self.venue_width} {self.description} {self.pic}"
+        return f"{self.venue_people_capa} {self.venue_width} {self.description} "
+    
+class SitType(models.Model):
+    sit_type = models.CharField(max_length=24)
+
+    def __str__(self):
+        return f"{self.sit_type} "
+    
+class SitPrice(models.Model):
+    sit_type = models.ForeignKey(SitType, on_delete=models.CASCADE, related_name="price_sit")
+    price = models.FloatField()
+
+    def __str__(self):
+        return f"{self.sit_type} {self.price}"
+
+class TotalSit(models.Model):
+    sit_available = models.IntegerField()
+    vip = models.IntegerField()
+    normal = models.IntegerField()
+
+    def save(self, *args, **kwargs):
+        self.sit_available = self.vip + self.normal
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        return f" {self.sit_available} {self.vip} {self.normal}"
