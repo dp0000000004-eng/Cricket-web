@@ -9,5 +9,6 @@ urlpatterns = [
     path("players/<int:team_id>/", views.player_view, name="player_view"),
     path("matches/", views.matches_view, name="match_view"),
     path("venues/", views.venue_view, name="venue_view"),
-    path("about_venue/<int:venue_id>/", views.about_venue, name="about_venue")
+    path("about_venue/<int:venue_id>/", views.about_venue, name="about_venue"),
+    path("book/", views.booking, name="book"),
 ]

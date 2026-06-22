@@ -1,0 +1,17 @@
+{% extends 'pl/layout.html' %}
+
+{% block body %}
+    {% for available in total_available %}
+        <h2>Total Available: {{ available.sit_available }} </h2>
+        <h2>VIP sits: {{ available.vip }} </h2>
+        <h2>Normal sits: {{ available.normal }} </h2>
+    {% endfor %}
+    <form method="POST">
+        {% csrf_token %}
+        <lable>Book Vip</lable>
+        {{ form.vip }}
+        <lable>Book Normal</lable>
+        {{ form.normal }}
+        <input type="submit">
+    </form>
+{% endblock %}

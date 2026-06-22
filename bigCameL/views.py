@@ -1,9 +1,10 @@
 from django.shortcuts import render, redirect
-from .models import Teams, Players, Matches, Venues, About_venue
+from .models import Teams, Players, Matches, Venues, About_venue, TotalSit
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
-from django.http import HttpResponseRedirect
+from .forms import BookingForm
 from django.contrib.auth.decorators import login_required
+
 
 # Create your views here.
 
@@ -48,3 +49,13 @@ def venue_view(request):
     venues = Venues.objects.all()
     return render(request, "pl/venues.html", {"venues":venues})
 
+def booking(request):
+    sit_available = TotalSit.objects.all()
+    if request.method == "POST":
+        form = BookingForm(request.POST)
+        if form.is_valid():
+            form.save()
+        else:
+            form = BookingForm()
+
+    return render(request, "pl/book.html" , {"form":BookingForm(request.POST), "total_available":sit_available})

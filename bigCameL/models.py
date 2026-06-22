@@ -93,3 +93,27 @@ class TotalSit(models.Model):
 
     def __str__(self):
         return f" {self.sit_available} {self.vip} {self.normal}"
+    
+class TotalBooked(models.Model):
+    sit = models.ForeignKey(TotalSit, on_delete=models.CASCADE, related_name="sit_book", default=TotalSit.objects.first)
+    total_booked = models.IntegerField(blank=True, null=True)
+    vip = models.IntegerField(blank=True, null=True)
+    normal = models.IntegerField(blank=True, null=True)
+
+    def save(self, *args, **kwargs):
+        self.total_booked = (self.vip or 0) + (self.normal or 0)
+        super().save(*args, **kwargs)
+
+        if self.sit:
+            self.sit.vip -= (self.vip or 0)
+            self.sit.normal -= (self.normal or 0)
+
+            self.sit.vip = max(self.sit.vip, 0)
+            self.sit.normal = max(self.sit.normal, 0)
+            self.sit.sit_available = self.sit.vip + self.sit.normal
+            self.sit.save()
+
+
+
+    def __str__(self):
+        return f"{self.total_booked} {self.vip} {self.normal}"
