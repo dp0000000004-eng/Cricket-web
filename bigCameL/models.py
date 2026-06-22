@@ -1,6 +1,6 @@
 from django.db import models
 from django.core.validators import MinValueValidator, MaxValueValidator
-
+from django.contrib.auth.models import User
 # Create your models here.
 
 
@@ -96,12 +96,15 @@ class TotalSit(models.Model):
     
 class TotalBooked(models.Model):
     sit = models.ForeignKey(TotalSit, on_delete=models.CASCADE, related_name="sit_book", default=TotalSit.objects.first)
+    username = models.ForeignKey(User, on_delete=models.CASCADE, related_name="user_book", null=True)
     total_booked = models.IntegerField(blank=True, null=True)
     vip = models.IntegerField(blank=True, null=True)
     normal = models.IntegerField(blank=True, null=True)
+    total_price = models.FloatField(blank=True, default=0)
 
     def save(self, *args, **kwargs):
         self.total_booked = (self.vip or 0) + (self.normal or 0)
+        self.total_price = (self.vip * 35000) + (self.normal * 15000)
         super().save(*args, **kwargs)
 
         if self.sit:
@@ -111,9 +114,12 @@ class TotalBooked(models.Model):
             self.sit.vip = max(self.sit.vip, 0)
             self.sit.normal = max(self.sit.normal, 0)
             self.sit.sit_available = self.sit.vip + self.sit.normal
+
+            
             self.sit.save()
 
 
 
     def __str__(self):
-        return f"{self.total_booked} {self.vip} {self.normal}"
+        return f"{self.total_booked} {self.vip} {self.normal} {self.total_price}"
+    

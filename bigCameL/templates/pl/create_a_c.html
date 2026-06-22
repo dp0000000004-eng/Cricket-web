@@ -1,0 +1,20 @@
+{% extends 'pl/layout.html' %}
+
+{% block body %}
+<h2>Create User Account</h2>
+    {% if messages %}
+        {% for m in messages %}
+            <p>{{ m }}</p>
+        {% endfor %}
+    {% endif %}
+    <form method="POST">
+        {% csrf_token %}
+        <label>Username: </label>
+        {{ form.username }}
+        <label>Email: </label>
+        {{ form.email }}
+        <label>PassWord: </label>
+        {{ form.password }}
+        <input type="submit">
+    </form>
+{% endblock %}

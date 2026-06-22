@@ -10,5 +10,6 @@ urlpatterns = [
     path("matches/", views.matches_view, name="match_view"),
     path("venues/", views.venue_view, name="venue_view"),
     path("about_venue/<int:venue_id>/", views.about_venue, name="about_venue"),
-    path("book/", views.booking, name="book"),
+    path("book/<int:user_id>/", views.booking, name="book"),
+    path("create_a_c/", views.createAccount, name="createAccount"),
 ]

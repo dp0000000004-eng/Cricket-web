@@ -6,6 +6,16 @@
         <h2>VIP sits: {{ available.vip }} </h2>
         <h2>Normal sits: {{ available.normal }} </h2>
     {% endfor %}
+    {% if messages %}
+        {% for m in messages %}
+            <p style="
+            color:green;
+            text-align:center;
+            font-family:sans-serif;">
+            {{ m }}
+        </p>
+        {% endfor %}
+    {% endif %}
     <form method="POST">
         {% csrf_token %}
         <lable>Book Vip</lable>
