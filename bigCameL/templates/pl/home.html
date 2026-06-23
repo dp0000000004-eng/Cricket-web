@@ -1,22 +1,111 @@
 {% extends 'pl/layout.html' %}
 {% load static %}
+{% load embed_video_tags %}
+
 {% block body %}
-    <div class="slider">
-        <div class="slides" id="img-cont">
-            <img class="slide" id="img-el" src="{% static 'pl/img/cmp1.avif' %}">
-            <img class="slide" id="img-el" src="{% static 'pl/img/ent.avif' %}">
-            <img class="slide" id="img-el" src="{% static 'pl/img/vk.avif' %}">
-            <img class="slide" id="img-el" src="{% static 'pl/img/vk2.avif' %}">
-        </div>
-        <button id="prev">&#10094</button>
-        <button id="next">&#10095</button>
-    </div>
-    <section>
-        <div>
-            
+<div class="home-page">
+
+    <section class="hero-slider">
+        <div class="slider">
+            <div class="slides" id="img-cont">
+                <img class="slide" id="img" src="{% static 'pl/img/cmp1.avif' %}" alt="Cricket stadium">
+                <img class="slide" id="img" src="{% static 'pl/img/ent.avif' %}" alt="IPL match">
+                <img class="slide" id="img" src="{% static 'pl/img/vk.avif' %}" alt="Cricket player">
+                <img class="slide" id="img" src="{% static 'pl/img/vk2.avif' %}" alt="Cricket celebration">
+            </div>
+
+            <button id="prev" class="slider-btn prev">&#10094;</button>
+            <button id="next" class="slider-btn next">&#10095;</button>
+
+            <div class="hero-content">
+                <p class="hero-tag">LIVE CRICKET • IPL UPDATES • MATCH MOMENTS</p>
+                <h1>Welcome to Cricket Fever</h1>
+                <p class="hero-text">
+                    Follow your favorite teams, players, match highlights, points table,
+                    and unforgettable cricket moments.
+                </p>
+
+                <div class="hero-actions">
+                    <a href="{% url 'match_view' %}" class="btn-primary">View Matches</a>
+                    <a href="{% url 'team_view' %}" class="btn-secondary">Explore Teams</a>
+                </div>
+            </div>
         </div>
     </section>
-    
-    <h1>welcome</h1>
-    
+
+    <section class="quick-stats">
+        <div class="stat-card">
+            <h3>10</h3>
+            <p>IPL Teams</p>
+        </div>
+
+        <div class="stat-card">
+            <h3>74</h3>
+            <p>Total Matches</p>
+        </div>
+
+        <div class="stat-card">
+            <h3>Live</h3>
+            <p>Score Updates</p>
+        </div>
+
+        <div class="stat-card">
+            <h3>Top</h3>
+            <p>Player Rankings</p>
+        </div>
+    </section>
+
+    <section class="section-block">
+        <div class="section-heading">
+            <p>Featured</p>
+            <h2>Today’s Cricket Highlights</h2>
+        </div>
+
+        <div class="feature-grid">
+            <div class="feature-card">
+                <title> {{ video.title.first }} </title>
+                <video width="300" height="150" controls>
+                    <source src="{{ object.video.url.first }}" type="video/mp4">
+                </video>
+                <div>
+                    <h3>Star Player Watch</h3>
+                    <p>Track top performances, runs, wickets, strike rate, and match-winning moments.</p>
+                </div>
+            </div>
+
+            <div class="feature-card">
+                <img src="{% static 'pl/img/cmp1.avif' %}" alt="Match preview">
+                <div>
+                    <h3>Match Preview</h3>
+                    <p>Get ready for upcoming IPL clashes with team form, venue details, and key players.</p>
+                </div>
+            </div>
+
+            <div class="feature-card">
+                <img src="{% static 'pl/img/ent.avif' %}" alt="Cricket entertainment">
+                <div>
+                    <h3>Fan Zone</h3>
+                    <p>Enjoy cricket stories, celebrations, rivalries, and unforgettable stadium energy.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="teams-section">
+        <div class="section-heading">
+            <p>IPL</p>
+            <h2>Popular Teams</h2>
+        </div>
+
+        <div class="team-list">
+            <div class="team-pill">RCB</div>
+            <div class="team-pill">CSK</div>
+            <div class="team-pill">MI</div>
+            <div class="team-pill">KKR</div>
+            <div class="team-pill">SRH</div>
+            <div class="team-pill">RR</div>
+        </div>
+    </section>
+
+</div>
 {% endblock %}

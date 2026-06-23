@@ -1,7 +1,8 @@
 const imgCont = document.getElementById("img-cont")
 const prevBtn = document.getElementById("prev")
 const nextBtn = document.getElementById("next")
-const frontImg = document.querySelectorAll("img")
+const frontImg = document.querySelectorAll("#img")
+console.log(frontImg)
 let slideIndex = 0
 let intervalId = null 
 

@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect
-from .models import Teams, Players, Matches, Venues, About_venue, TotalSit
+from .models import Teams, Players, Matches, Venues, About_venue, TotalSit, Video
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
 from .forms import BookingForm, UserForm
@@ -36,7 +36,8 @@ def login_view(request):
 
 @login_required
 def home(request):
-    return render(request, "pl/home.html")
+    video = Video.objects.all()
+    return render(request, "pl/home.html", {"video":video})
 
 def about_venue(request, venue_id):
     about_venues = About_venue.objects.filter(id=venue_id)
