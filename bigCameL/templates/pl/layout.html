@@ -26,6 +26,7 @@
             <a href="{% url 'venue_view' %}" class="nav-item " id="nav-venue">Venues</a>
             <a href="{% url 'book' user.id %}" class="nav-item" id="nav-book">Book</a>
             <a href="{% url 'createAccount' %}" class="nav-item" id="nav-create_a_c">Create account</a>
+            <a href="{% url 'login' %}" class="nav-item" id="nav-login">Login<i class="fa-solid fa-user user-icon"></i></a>
             </nav>
         </aside>
         <div class="main">
@@ -42,7 +43,7 @@
     </body>
     <footer>
         <div>
-            <p>Thanks</p>
+            <a href="{% url 'logout' %}">Logout</a>
         </div>
     </footer>
 </html>

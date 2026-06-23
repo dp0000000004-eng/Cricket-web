@@ -21,6 +21,8 @@ def player_view(request, team_id):
     return render(request, "pl/players.html", {"players":players})
 
 def login_view(request):
+    if request.user.is_authenticated:
+        redirect('home')
     if request.method == "POST":
         username = request.POST.get('username')
         password = request.POST.get('password')
@@ -34,10 +36,10 @@ def login_view(request):
     return render(request, "pl/login.html")
 
 
-@login_required
+
 def home(request):
-    video = Video.objects.all()
-    return render(request, "pl/home.html", {"video":video})
+    videos = Video.objects.first()
+    return render(request, "pl/home.html", {"videos":videos})
 
 def about_venue(request, venue_id):
     about_venues = About_venue.objects.filter(id=venue_id)
@@ -51,6 +53,7 @@ def venue_view(request):
     venues = Venues.objects.all()
     return render(request, "pl/venues.html", {"venues":venues})
 
+@login_required
 def booking(request, user_id):
     sit_available = TotalSit.objects.all()
     if request.method == "POST":
@@ -76,3 +79,8 @@ def createAccount(request):
         user.save()
         messages.success(request, message="Account Created")
     return render(request, "pl/create_a_c.html", {"form":UserForm(request.POST)})
+
+@login_required
+def logout_view(request):
+    logout(request)
+    return redirect("login")
