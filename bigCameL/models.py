@@ -130,3 +130,18 @@ class Video(models.Model):
 
     def __str__(self):
         return self.title
+    
+
+class Champs(models.Model):
+    year = models.IntegerField()
+    champs = models.CharField(max_length=64)
+
+    def __str__(self):
+        return f"{self.year} {self.champs}"
+    
+class Blog(models.Model):
+    year = models.ForeignKey(Champs, on_delete=models.CASCADE, related_name="champ_year")
+    blog = models.CharField(max_length=10000)
+
+    def __str__(self):
+        return f"{self.year} {self.blog}"

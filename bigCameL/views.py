@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect
-from .models import Teams, Players, Matches, Venues, About_venue, TotalSit, Video
+from .models import Teams, Players, Matches, Venues, About_venue, TotalSit, Video, Champs, Blog
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
 from .forms import BookingForm, UserForm
@@ -84,3 +84,12 @@ def createAccount(request):
 def logout_view(request):
     logout(request)
     return redirect("login")
+
+
+def champs(request):
+    champs = Champs.objects.all()
+    return render(request, "pl/champs.html" ,{"champs":champs})
+
+def blog_view(request, team_id):
+    blog = Blog.objects.filter(year=team_id)
+    return render(request, "pl/blog.html", {"blog":blog})

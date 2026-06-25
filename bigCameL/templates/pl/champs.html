@@ -1,0 +1,9 @@
+{% extends 'pl/layout.html' %}
+
+{% block body %}
+    <ul>
+        {% for champ in champs %}
+        <a href="{% url 'full_blog' champ.id %}"><li>{{ champ }} (Champs)</li></a>
+        {% endfor %}
+    </ul>
+{% endblock %}

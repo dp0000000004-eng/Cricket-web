@@ -1,0 +1,11 @@
+{% extends 'pl/layout.html' %}
+
+{% block body %}
+{% if blog %}
+    {% for b in blog %}
+    <p>
+        {{ b }}
+    </p>
+    {% endfor %}
+{% endif %}
+{% endblock %}

@@ -12,5 +12,7 @@ urlpatterns = [
     path("about_venue/<int:venue_id>/", views.about_venue, name="about_venue"),
     path("book/<int:user_id>/", views.booking, name="book"),
     path("create_a_c/", views.createAccount, name="createAccount"),
-    path("logout/", views.logout_view, name="logout")
+    path("logout/", views.logout_view, name="logout"),
+    path("champs/", views.champs, name="blog"),
+    path("blog/<int:team_id>/", views.blog_view, name="full_blog")
 ]

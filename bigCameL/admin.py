@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import City, Teams, Official_code_of_playertype, Venues, Players, Matches, About_venue, SitType, TotalSit, SitPrice, TotalBooked, Video
+from .models import City, Teams, Official_code_of_playertype, Venues, Players, Matches, About_venue, SitType, TotalSit, SitPrice, TotalBooked, Video, Champs, Blog
 
 # Register your models here.
 
@@ -16,3 +16,5 @@ admin.site.register(TotalSit)
 admin.site.register(SitPrice)
 admin.site.register(TotalBooked)
 admin.site.register(Video)
+admin.site.register(Champs)
+admin.site.register(Blog)
