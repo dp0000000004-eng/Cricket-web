@@ -2,6 +2,7 @@ from django.db import models
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.contrib.auth.models import User
 from embed_video.fields import EmbedVideoField
+from django.core.exceptions import ValidationError
 # Create your models here.
 
 
@@ -56,6 +57,10 @@ class Matches(models.Model):
     date_time = models.DateTimeField(blank=True ,null=True)
     city = models.ForeignKey(City, on_delete=models.CASCADE, related_name="match_city")
 
+
+    def checking(self):
+        if self.team1 == self.team2:
+            raise ValidationError("Team 1 and Team 2 can't be same")
 
     def __str__(self):
         return f"{self.team1} {self.team2} {self.venue} {self.home_of} {self.city} {self.city}"

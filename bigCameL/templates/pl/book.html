@@ -9,6 +9,17 @@
     {% if messages %}
         {% for m in messages %}
             <p style="
+            color:red;
+            text-align:center;
+            font-family:sans-serif;">
+            {{ m }}
+        </p>
+        {% endfor %}
+    {% endif %}
+    {% if form %}
+    {% if messages %}
+        {% for m in messages %}
+            <p style="
             color:green;
             text-align:center;
             font-family:sans-serif;">
@@ -24,4 +35,5 @@
         {{ form.normal }}
         <input type="submit">
     </form>
+    {% endif %}
 {% endblock %}

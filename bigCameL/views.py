@@ -55,16 +55,26 @@ def venue_view(request):
 
 @login_required
 def booking(request, user_id):
+
+    sit_left = TotalSit.objects.first().sit_available
+
+    if sit_left == 0:
+        info_msg = messages.info(request, message="No sit available")
+        return render(request, "pl/book.html" , {"info_msg":info_msg})
+
+
     sit_available = TotalSit.objects.all()
-    if request.method == "POST":
-        form = BookingForm(request.POST)
-        if form.is_valid():
-            book = form.save(commit=False)
-            book.username = request.user
-            book.save()
-            messages.success(request, message="Thank's For Booking")
-        else:
-            form = BookingForm()
+
+    if sit_left != 0:
+        if request.method == "POST":
+            form = BookingForm(request.POST)
+            if form.is_valid():
+                book = form.save(commit=False)
+                book.username = request.user
+                book.save()
+                messages.success(request, message="Thank's For Booking")
+            else:
+                form = BookingForm()
 
     return render(request, "pl/book.html" , {"form":BookingForm(request.POST), "total_available":sit_available})
 
