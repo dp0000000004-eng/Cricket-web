@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect
-from .models import Teams, Players, Matches, Venues, About_venue, TotalSit, Video, Champs, Blog
+from .models import Teams, Players, Matches, Venues, About_venue, TotalSit, Video, Champs, Blog, SitPrice
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
 from .forms import BookingForm, UserForm
@@ -57,15 +57,18 @@ def venue_view(request):
 def booking(request, user_id):
 
     sit_left = TotalSit.objects.first().sit_available
+    vip_sit_price = SitPrice.objects.all()[0].price
+    normal_sit_price = SitPrice.objects.all()[1].price
+    nothing_left = 0
 
-    if sit_left == 0:
+    if sit_left == nothing_left:
         info_msg = messages.info(request, message="No sit available")
         return render(request, "pl/book.html" , {"info_msg":info_msg})
 
 
     sit_available = TotalSit.objects.all()
 
-    if sit_left != 0:
+    if sit_left != nothing_left:
         if request.method == "POST":
             form = BookingForm(request.POST)
             if form.is_valid():
@@ -76,7 +79,7 @@ def booking(request, user_id):
             else:
                 form = BookingForm()
 
-    return render(request, "pl/book.html" , {"form":BookingForm(request.POST), "total_available":sit_available})
+    return render(request, "pl/book.html" , {"form":BookingForm(request.POST), "total_available":sit_available, "vip_price":vip_sit_price, "normal_price":normal_sit_price})
 
 
 def createAccount(request):

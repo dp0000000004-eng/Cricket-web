@@ -3,8 +3,10 @@
 {% block body %}
     {% for available in total_available %}
         <h2>Total Available: {{ available.sit_available }} </h2>
-        <h2>VIP sits: {{ available.vip }} </h2>
-        <h2>Normal sits: {{ available.normal }} </h2>
+        <div class="hardcore" id="vip">
+        <h2>VIP sits: {{ available.vip }} Cost: ₹{{ vip_price }}</h2></div>
+        <div class="hardcore" id="normal">
+        <h2>Normal sits: {{ available.normal }} Cost: ₹{{ normal_price }}</h2></div>
     {% endfor %}
     {% if messages %}
         {% for m in messages %}
@@ -29,11 +31,20 @@
     {% endif %}
     <form method="POST">
         {% csrf_token %}
-        <lable>Book Vip</lable>
-        {{ form.vip }}
-        <lable>Book Normal</lable>
-        {{ form.normal }}
-        <input type="submit">
+        <div class="hardcore" id="vip">
+        <lable>{{ form.vip.label }}</lable>
+        {{ form.vip }}</div>
+        <div class="hardcore" id="normal">
+        <lable>{{ form.normal.norml }}</lable>
+        {{ form.normal }}</div>
+        <input type="submit" value="Purchase">
     </form>
     {% endif %}
+
+    <script>
+        const vipEl = document.getElementById("vip")
+        const normalEl = document.getElementById("normal")
+
+        vipEl.classList.add("hide")
+    </script>
 {% endblock %}

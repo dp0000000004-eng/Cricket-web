@@ -1,16 +1,30 @@
-from .models import TotalBooked
+from .models import TotalBooked, TotalSit
 from django import forms
 from django.contrib.auth.models import User
 
 
 class BookingForm(forms.ModelForm):
     class Meta:
-        model = TotalBooked
-        fields = ['vip','normal']
-        widgets = {
-            "vip":forms.NumberInput(attrs={'min':0}),
-            "normal":forms.NumberInput(attrs={'min':0})
-        }
+        vip_sit = int(TotalSit.objects.first().vip)
+        normal_sit = int(TotalSit.objects.first().normal)
+
+        if vip_sit > 0 and normal_sit > 0:
+            model = TotalBooked
+            fields = ['vip','normal']
+            labels = {
+                'vip': 'Book Vip Sit: ',
+                'normal': 'Book normal Sit: ',
+            }
+            widgets = {
+                "vip":forms.NumberInput(attrs={'min':0}),
+                "normal":forms.NumberInput(attrs={'min':0})
+            }
+        elif vip_sit > 0 and normal_sit == 0:
+            model = TotalBooked
+            fields = ['vip']
+        elif vip_sit == 0 and normal_sit > 0:
+            model = TotalBooked
+            fields = ['normal']
 
 
 class UserForm(forms.ModelForm):

@@ -104,13 +104,13 @@ class TotalBooked(models.Model):
     sit = models.ForeignKey(TotalSit, on_delete=models.CASCADE, related_name="sit_book", default=TotalSit.objects.first)
     username = models.ForeignKey(User, on_delete=models.CASCADE, related_name="user_book", null=True)
     total_booked = models.IntegerField(blank=True, null=True)
-    vip = models.IntegerField(blank=True, null=True)
-    normal = models.IntegerField(blank=True, null=True)
+    vip = models.IntegerField(blank=True, null=True, default=0)
+    normal = models.IntegerField(blank=True, null=True, default=0)
     total_price = models.FloatField(blank=True, default=0)
 
     def save(self, *args, **kwargs):
         self.total_booked = (self.vip or 0) + (self.normal or 0)
-        self.total_price = (self.vip * 35000) + (self.normal * 15000)
+        self.total_price = ((self.vip or 0) * 35000) + ((self.normal or 0) * 15000)
         super().save(*args, **kwargs)
 
         if self.sit:
