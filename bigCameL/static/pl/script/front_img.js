@@ -7,11 +7,12 @@ let slideIndex = 0
 let intervalId = null 
 
 addEventListener("DOMContentLoaded", () => {
-    intilaizer(frontImg)
+    initializer(frontImg)
     startAutoPlay()
 })
 
-function intilaizer(arr) {
+
+function initializer(arr) {
     frontImg[slideIndex].classList.add("displaySlide")
 }
 
@@ -21,7 +22,7 @@ prevBtn.addEventListener("click", function() {
     if (slideIndex < 0) {
         slideIndex = (frontImg.length - 1)
     }
-    intilaizer(frontImg)
+    initializer(frontImg)
     clearInterval(intervalId)
 })
 
@@ -33,7 +34,7 @@ nextBtn.addEventListener("click", function () {
     if (slideIndex > (frontImg.length - 1)){
         slideIndex = 0
     }
-    intilaizer(frontImg)
+    initializer(frontImg)
     clearInterval(intervalId)
 })
 
@@ -46,7 +47,7 @@ function startAutoPlay(){
         if (slideIndex > (frontImg.length - 1)){
             slideIndex = 0
         }
-    intilaizer(frontImg)
+    initializer(frontImg)
     }, 5000)
 
 }

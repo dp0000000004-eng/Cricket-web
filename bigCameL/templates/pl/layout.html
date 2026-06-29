@@ -14,6 +14,7 @@
         <link rel="stylesheet" href="{% static 'pl/water_drop_card.css' %}">
         <link rel="stylesheet" href="{% static 'pl/book.css' %}">
         <link rel="stylesheet" href="{% static 'pl/home.css' %}">
+        <link rel="stylesheet" href="{% static 'pl/footer.css' %}">
     </head>
     <body>
         <div class="layout">
@@ -42,9 +43,10 @@
         </div>
         <script type="module" src="{% static 'pl/script/main.js' %}"></script>
     </body>
+    <hr>
     <footer>
-        <div>
-            <a href="{% url 'logout' %}">Logout</a>
+        <div class="credits">
+            <span>Built and designed by <a href="https://www.instagram.com/debazj" target="_blank" >deba</a> </span>
         </div>
     </footer>
 </html>

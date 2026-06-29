@@ -2,8 +2,10 @@
 
 {% block body %}
     <ul>
+        <h2>Click Below on cards For Full Blog</h2>
         {% for champ in champs %}
-        <a href="{% url 'full_blog' champ.id %}"><li>{{ champ }} (Champs)</li></a>
+        
+        <a href="{% url 'full_blog' champ.id %}"><li>{{ champ }} (Champs)  </li></a>
         {% endfor %}
     </ul>
 {% endblock %}

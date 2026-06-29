@@ -11,10 +11,17 @@
 .slider img {
     width:100%;
     display:none;
+    border-radius:3px;
+    opacity:  0.8  ease-out;
+    
+}
+.slide {
+    border-radius:3px;
 }
 
 .slide.displaySlide  {
     display:block;
+    opacity:1
 }
 
 .slides button {

@@ -35,16 +35,10 @@
         <lable>{{ form.vip.label }}</lable>
         {{ form.vip }}</div>
         <div class="hardcore" id="normal">
-        <lable>{{ form.normal.norml }}</lable>
+        <lable>{{ form.normal.label }}</lable>
         {{ form.normal }}</div>
         <input type="submit" value="Purchase">
     </form>
     {% endif %}
 
-    <script>
-        const vipEl = document.getElementById("vip")
-        const normalEl = document.getElementById("normal")
-
-        vipEl.classList.add("hide")
-    </script>
 {% endblock %}

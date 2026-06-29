@@ -1,3 +1,14 @@
-footer {
+footer div {
     text-align:center;
+}
+
+.credits a {
+    color:#1a73e8;
+
+}
+
+hr {
+    border-top:1px solid #1a73e8;
+    width:1000px;
+    margin:0 auto;
 }

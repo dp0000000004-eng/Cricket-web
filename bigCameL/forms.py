@@ -22,9 +22,15 @@ class BookingForm(forms.ModelForm):
         elif vip_sit > 0 and normal_sit == 0:
             model = TotalBooked
             fields = ['vip']
+            widgets = {
+                "vip":forms.NumberInput(attrs={'min':0})
+            }
         elif vip_sit == 0 and normal_sit > 0:
             model = TotalBooked
             fields = ['normal']
+            widgets = {
+                "normal":forms.NumberInput(attrs={'min':0})
+            }
 
 
 class UserForm(forms.ModelForm):
@@ -34,11 +40,3 @@ class UserForm(forms.ModelForm):
         widgets = {
             "password":forms.PasswordInput(attrs={'minlength':8})
         }
-
-        def save(self, commit=True):
-            user = super().save(commit=False)
-            user.set_password(self.cleaned_data["password"])
-            if commit:
-                user.save()
-                
-            return user
