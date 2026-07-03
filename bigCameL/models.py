@@ -150,3 +150,15 @@ class Blog(models.Model):
 
     def __str__(self):
         return f"{self.year} {self.blog}"
+    
+
+class Fam(models.Model):
+    name = models.CharField(max_length=64)
+    email = models.EmailField()
+    title = models.CharField(max_length=64)
+    image = models.ImageField(upload_to='fam_img')
+    description = models.CharField(max_length=500)
+
+    def __str__(self):
+
+        return f"{self.name} {self.email} {self.title} {self.image} {self.description}"

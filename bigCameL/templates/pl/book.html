@@ -5,6 +5,9 @@
 {% endblock %}
 
 {% block body %}
+
+    <h1> {{ greet }} {{ request.user.username }}</h1>
+
 {% if messages %}
         {% for m in messages %}
             <p class="{{ m.tags }}">{{ m }}</p>

@@ -1,4 +1,4 @@
-from .models import TotalBooked, TotalSit
+from .models import TotalBooked, TotalSit, Fam
 from django import forms
 from django.contrib.auth.models import User
 
@@ -40,3 +40,9 @@ class UserForm(forms.ModelForm):
         widgets = {
             "password":forms.PasswordInput(attrs={'minlength':8})
         }
+
+
+class FamForm(forms.ModelForm):
+    class Meta:
+        model = Fam
+        fields = [ 'email', 'title',  'image', 'description']

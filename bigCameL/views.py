@@ -2,9 +2,10 @@ from django.shortcuts import render, redirect
 from .models import Teams, Players, Matches, Venues, About_venue, TotalSit, Video, Champs, Blog, SitPrice
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
-from .forms import BookingForm, UserForm
+from .forms import BookingForm, UserForm, FamForm
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
+import random
 
 
 # Create your views here.
@@ -56,6 +57,15 @@ def venue_view(request):
 
 def booking(request):
     if request.user.is_authenticated:
+
+
+
+        greetMsg = [
+                    "welcome ",
+                    "Have a Good day ",
+                    "hello, ",
+                    "nice coffe, "
+                ]
         
 
         sit_left = TotalSit.objects.first().sit_available
@@ -72,6 +82,9 @@ def booking(request):
 
         if sit_left != nothing_left:
             if request.method == "POST":
+
+
+
                 form = BookingForm(request.POST)
                 if form.is_valid():
                     book = form.save(commit=False)
@@ -82,7 +95,7 @@ def booking(request):
                 else:
                     form = BookingForm()
 
-        return render(request, "pl/book.html" , {"form":BookingForm(request.POST), "total_available":sit_available, "vip_price":vip_sit_price, "normal_price":normal_sit_price})
+        return render(request, "pl/book.html" , {"form":BookingForm(request.POST), "total_available":sit_available, "vip_price":vip_sit_price, "normal_price":normal_sit_price, "greet":random.choice(greetMsg)})
     else:
         return redirect("login")
 
@@ -109,5 +122,38 @@ def champs(request):
     return render(request, "pl/champs.html" ,{"champs":champs})
 
 def blog_view(request, team_id):
-    blog = Blog.objects.filter(year=team_id)
-    return render(request, "pl/blog.html", {"blog":blog})
+    last_count = Champs.objects.count()
+    if team_id > last_count:
+        return redirect('blog')
+    if team_id <= last_count:
+        blog = Blog.objects.filter(year=team_id)
+        if team_id == 0:
+            return redirect('blog')
+        
+        return render(request, "pl/blog.html", {"blog":blog, "team_id":team_id, "last_count":last_count})
+
+
+def fam_view(request, user_id):
+    
+
+    greetings = [
+        "Thanks for the love, have a nice day!",
+        "Wishing you joy and sunshine all day long!",
+        "Stay positive, stay happy, stay blessed!",
+        "Good vibes only — keep smiling!",
+        "May your day be filled with peace and laughter!",
+        "Sending warm wishes your way!",
+        "Happiness looks good on you — enjoy your day!",
+        "Gratitude makes the day brighter!",
+        "Cheers to a wonderful day ahead!",
+        "Keep shining, the world needs your light!"
+    ]
+
+
+    if request.method == 'POST':
+        form = FamForm(request.POST, request.FILES)
+        if form.is_valid():
+            fam = form.save(commit=False)
+            fam.name = request.user
+            fam.save()
+            messages.success(request, message="thanks for Love, Have Nice Day!")
