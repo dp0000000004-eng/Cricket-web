@@ -56,3 +56,18 @@ input[type="submit"]:hover {
 form .hardcore.hide {
     display:none;
 }
+
+.error {
+    color:red;
+    font-weight:bold;
+}
+
+.success {
+    color:green;
+    font-weight:bold;
+}
+
+.info {
+    color:red;
+    font-weight:bold;
+}

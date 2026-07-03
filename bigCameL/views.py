@@ -29,7 +29,7 @@ def login_view(request):
         user = authenticate(request, username=username, password=password)
         if user is not None:
             login(request, user)
-            return redirect('home')
+            return redirect('book')
         else:
             messages.error(request, message="Invalid Username or password!")
 
@@ -53,33 +53,38 @@ def venue_view(request):
     venues = Venues.objects.all()
     return render(request, "pl/venues.html", {"venues":venues})
 
-@login_required
-def booking(request, user_id):
 
-    sit_left = TotalSit.objects.first().sit_available
-    vip_sit_price = SitPrice.objects.all()[0].price
-    normal_sit_price = SitPrice.objects.all()[1].price
-    nothing_left = 0
+def booking(request):
+    if request.user.is_authenticated:
+        
 
-    if sit_left == nothing_left:
-        info_msg = messages.info(request, message="No sit available")
-        return render(request, "pl/book.html" , {"info_msg":info_msg})
+        sit_left = TotalSit.objects.first().sit_available
+        vip_sit_price = SitPrice.objects.all()[0].price
+        normal_sit_price = SitPrice.objects.all()[1].price
+        nothing_left = 0
+
+        if sit_left == nothing_left:
+            info_msg = messages.info(request, message="No sit available")
+            return render(request, "pl/book.html" , {"info_msg":info_msg})
 
 
-    sit_available = TotalSit.objects.all()
+        sit_available = TotalSit.objects.all()
 
-    if sit_left != nothing_left:
-        if request.method == "POST":
-            form = BookingForm(request.POST)
-            if form.is_valid():
-                book = form.save(commit=False)
-                book.username = request.user
-                book.save()
-                messages.success(request, message="Thank's For Booking")
-            else:
-                form = BookingForm()
+        if sit_left != nothing_left:
+            if request.method == "POST":
+                form = BookingForm(request.POST)
+                if form.is_valid():
+                    book = form.save(commit=False)
+                    book.username = request.user
+                    book.save()
+                    messages.success(request, message="Thank's For Booking")
+                    form = BookingForm()
+                else:
+                    form = BookingForm()
 
-    return render(request, "pl/book.html" , {"form":BookingForm(request.POST), "total_available":sit_available, "vip_price":vip_sit_price, "normal_price":normal_sit_price})
+        return render(request, "pl/book.html" , {"form":BookingForm(request.POST), "total_available":sit_available, "vip_price":vip_sit_price, "normal_price":normal_sit_price})
+    else:
+        return redirect("login")
 
 
 def createAccount(request):

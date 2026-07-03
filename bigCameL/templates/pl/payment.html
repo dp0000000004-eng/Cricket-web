@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>
+            Payment
+        </title>
+    </head>
+    <body>
+        <form method="POST">
+            {% csrf_token %}
+            <lable>Add Amount</lable>
+            <input type="number" name="payment" placeholder="Add Amount">
+            <input type="submit" value="pay">
+        </form>
+    </body>
+</html>

@@ -1,6 +1,15 @@
 {% extends 'pl/layout.html' %}
 
+{% block title %}
+    Book
+{% endblock %}
+
 {% block body %}
+{% if messages %}
+        {% for m in messages %}
+            <p class="{{ m.tags }}">{{ m }}</p>
+        {% endfor %}
+{% endif %}
     {% for available in total_available %}
         <h2>Total Available: {{ available.sit_available }} </h2>
         <div class="hardcore" id="vip">
@@ -8,25 +17,10 @@
         <div class="hardcore" id="normal">
         <h2>Normal sits: {{ available.normal }} Cost: ₹{{ normal_price }}</h2></div>
     {% endfor %}
-    {% if messages %}
-        {% for m in messages %}
-            <p style="
-            color:red;
-            text-align:center;
-            font-family:sans-serif;">
-            {{ m }}
-        </p>
-        {% endfor %}
-    {% endif %}
     {% if form %}
     {% if messages %}
         {% for m in messages %}
-            <p style="
-            color:green;
-            text-align:center;
-            font-family:sans-serif;">
-            {{ m }}
-        </p>
+            <p class="{{ m.tags }}">{{ m }}</p>
         {% endfor %}
     {% endif %}
     <form method="POST">

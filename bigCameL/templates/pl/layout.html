@@ -5,7 +5,9 @@
 <html lang="en">
     <head>
         <title>
-            Home
+            {% block title %}
+                Home
+            {% endblock %}
         </title>
         <link rel="stylesheet" href="{% static 'pl/index.css' %}">
         <link rel="stylesheet" href="{% static 'pl/layout.css' %}">
@@ -25,7 +27,11 @@
             <a href="{% url 'team_view' %}" class="nav-item " id="nav-teams">Teams</a>
             <a href="{% url 'match_view' %}" class="nav-item " id="nav-matches">Matches</a>
             <a href="{% url 'venue_view' %}" class="nav-item " id="nav-venue">Venues</a>
-            <a href="{% url 'book' user.id %}" class="nav-item" id="nav-book">Book</a>
+            {% if request.user %}
+                <a href="{% url 'book' %}" class="nav-item" id="nav-book">Book</a>
+            {% else %}
+            <a href="#" ></a>
+            {% endif %}
             <a href="{% url 'createAccount' %}" class="nav-item" id="nav-create_a_c">Create account</a>
             <a href="{% url 'blog' %}" class="nav-item" id="nav-champs">Blog</a>
             <a href="{% url 'login' %}" class="nav-item" id="nav-login">Login<i class="fa-solid fa-user user-icon"></i></a>
@@ -46,7 +52,8 @@
     <hr>
     <footer>
         <div class="credits">
-            <span>Built and designed by <a href="https://www.instagram.com/debazj" target="_blank" >deba</a> </span>
+            <span>Built and designed by <a href="https://www.instagram.com/debazj" target="_blank" >deba</a> </span><br>
+            <a href="{% url 'logout' %}">Logout</a>
         </div>
     </footer>
 </html>
