@@ -1,4 +1,4 @@
-from .models import TotalBooked, TotalSit, Fam
+from .models import TotalBooked, TotalSit, FanOfIPL
 from django import forms
 from django.contrib.auth.models import User
 
@@ -44,5 +44,5 @@ class UserForm(forms.ModelForm):
 
 class FamForm(forms.ModelForm):
     class Meta:
-        model = Fam
-        fields = [ 'email', 'title',  'image', 'description']
+        model = FanOfIPL
+        fields = [ 'email', 'title',  'fan_image', 'descriptions']

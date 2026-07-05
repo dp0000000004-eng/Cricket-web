@@ -151,14 +151,12 @@ class Blog(models.Model):
     def __str__(self):
         return f"{self.year} {self.blog}"
     
-
-class Fam(models.Model):
-    name = models.CharField(max_length=64)
+class FanOfIPL(models.Model):
+    username = models.ForeignKey(User, on_delete=models.CASCADE, related_name="user_fam")
     email = models.EmailField()
     title = models.CharField(max_length=64)
-    image = models.ImageField(upload_to='fam_img')
-    description = models.CharField(max_length=500)
+    fan_image = models.ImageField(upload_to='fan_img')
+    descriptions = models.CharField(max_length=400)
 
     def __str__(self):
-
-        return f"{self.name} {self.email} {self.title} {self.image} {self.description}"
+        return self.title

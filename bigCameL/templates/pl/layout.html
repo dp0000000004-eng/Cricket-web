@@ -18,6 +18,7 @@
         <link rel="stylesheet" href="{% static 'pl/home.css' %}">
         <link rel="stylesheet" href="{% static 'pl/footer.css' %}">
         <link rel="stylesheet" href="{% static 'pl/blog.css' %}">
+        <link rel="stylesheet" href="{% static 'pl/fam.css' %}">
     </head>
     <body>
         <div class="layout">
@@ -36,6 +37,8 @@
             <a href="{% url 'createAccount' %}" class="nav-item" id="nav-create_a_c">Create account</a>
             <a href="{% url 'blog' %}" class="nav-item" id="nav-champs">Blog</a>
             <a href="{% url 'login' %}" class="nav-item" id="nav-login">Login<i class="fa-solid fa-user user-icon"></i></a>
+            <a href="{% url 'fam' %}" class="nav-item" id="nav-fam">Fam's</a>
+
             </nav>
         </aside>
         <div class="main">

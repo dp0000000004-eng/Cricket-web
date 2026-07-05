@@ -14,5 +14,6 @@ urlpatterns = [
     path("create_a_c/", views.createAccount, name="createAccount"),
     path("logout/", views.logout_view, name="logout"),
     path("champs/", views.champs, name="blog"),
-    path("blog/<int:team_id>/", views.blog_view, name="full_blog")
+    path("blog/<int:team_id>/", views.blog_view, name="full_blog"),
+    path("fam/", views.fam_view, name="fam")
 ]

@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect
-from .models import Teams, Players, Matches, Venues, About_venue, TotalSit, Video, Champs, Blog, SitPrice
+from .models import Teams, Players, Matches, Venues, About_venue, TotalSit, Video, Champs, Blog, SitPrice, FanOfIPL
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
 from .forms import BookingForm, UserForm, FamForm
@@ -133,27 +133,36 @@ def blog_view(request, team_id):
         return render(request, "pl/blog.html", {"blog":blog, "team_id":team_id, "last_count":last_count})
 
 
-def fam_view(request, user_id):
-    
+def fam_view(request):
 
-    greetings = [
-        "Thanks for the love, have a nice day!",
-        "Wishing you joy and sunshine all day long!",
-        "Stay positive, stay happy, stay blessed!",
-        "Good vibes only — keep smiling!",
-        "May your day be filled with peace and laughter!",
-        "Sending warm wishes your way!",
-        "Happiness looks good on you — enjoy your day!",
-        "Gratitude makes the day brighter!",
-        "Cheers to a wonderful day ahead!",
-        "Keep shining, the world needs your light!"
-    ]
+    if request.user.is_authenticated:
+
+        fams = FanOfIPL.objects.all()
+
+        greetings = [
+            "Thanks for the love, have a nice day!",
+            "Wishing you joy and sunshine all day long!",
+            "Stay positive, stay happy, stay blessed!",
+            "Good vibes only — keep smiling!",
+            "May your day be filled with peace and laughter!",
+            "Sending warm wishes your way!",
+            "Happiness looks good on you — enjoy your day!",
+            "Gratitude makes the day brighter!",
+            "Cheers to a wonderful day ahead!",
+            "Keep shining, the world needs your light!"
+        ]
 
 
-    if request.method == 'POST':
-        form = FamForm(request.POST, request.FILES)
-        if form.is_valid():
-            fam = form.save(commit=False)
-            fam.name = request.user
-            fam.save()
-            messages.success(request, message="thanks for Love, Have Nice Day!")
+        if request.method == 'POST':
+            form = FamForm(request.POST, request.FILES)
+            if form.is_valid():
+                fam = form.save(commit=False)
+                fam.username = request.user
+                fam.save()
+                return redirect("fam")
+                messages.success(request, "Done  ")
+        else:
+            form = FamForm()
+        return render(request, "pl/fam.html", {"form":form, "greetings":random.choice(greetings), "fams":fams})
+    else:
+        return redirect('login')
