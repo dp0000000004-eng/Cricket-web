@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect
-from .models import Teams, Players, Matches, Venues, About_venue, TotalSit, Video, Champs, Blog, SitPrice, FanOfIPL
+from .models import Teams, Players, Matches, Venues, About_venue, TotalSit, Video, Champs, Blog, SitPrice, FanOfIPL, IPLMeta
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
 from .forms import BookingForm, UserForm, FamForm
@@ -39,8 +39,11 @@ def login_view(request):
 
 
 def home(request):
+
+    ipl = IPLMeta.objects.all()[0]
     videos = Video.objects.first()
-    return render(request, "pl/home.html", {"videos":videos})
+
+    return render(request, "pl/home.html", {"videos":videos, "ipl":ipl})
 
 def about_venue(request, venue_id):
     about_venues = About_venue.objects.filter(id=venue_id)
@@ -159,10 +162,11 @@ def fam_view(request):
                 fam = form.save(commit=False)
                 fam.username = request.user
                 fam.save()
-                return redirect("fam")
                 messages.success(request, "Done  ")
+                return redirect("fam")
         else:
             form = FamForm()
         return render(request, "pl/fam.html", {"form":form, "greetings":random.choice(greetings), "fams":fams})
     else:
         return redirect('login')
+    

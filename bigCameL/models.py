@@ -160,3 +160,12 @@ class FanOfIPL(models.Model):
 
     def __str__(self):
         return self.title
+    
+
+class IPLMeta(models.Model):
+    total_team = models.IntegerField()
+    total_matches = models.IntegerField()
+    total_venue = models.IntegerField()
+
+    def __str__(self):
+        return f"{self.total_team} {self.total_matches} {self.total_venue}"

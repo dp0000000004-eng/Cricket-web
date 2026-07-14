@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import City, Teams, Official_code_of_playertype, Venues, Players, Matches, About_venue, SitType, TotalSit, SitPrice, TotalBooked, Video, Champs, Blog, FanOfIPL
+from .models import City, Teams, Official_code_of_playertype, Venues, Players, Matches, About_venue, SitType, TotalSit, SitPrice, TotalBooked, Video, Champs, Blog, FanOfIPL, IPLMeta
 
 # Register your models here.
 
@@ -19,3 +19,4 @@ admin.site.register(Video)
 admin.site.register(Champs)
 admin.site.register(Blog)
 admin.site.register(FanOfIPL)
+admin.site.register(IPLMeta)
