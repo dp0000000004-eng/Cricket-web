@@ -41,7 +41,7 @@ def login_view(request):
 def home(request):
 
     ipl = IPLMeta.objects.all()[0]
-    videos = Video.objects.first()
+    videos = Video.objects.all()
 
     return render(request, "pl/home.html", {"videos":videos, "ipl":ipl})
 

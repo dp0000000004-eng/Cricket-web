@@ -1,4 +1,4 @@
-{% extends 'pl/layout.html' %}
+ {% extends 'pl/layout.html' %}
 {% load static %}
 {% load embed_video_tags %}
 
@@ -66,16 +66,21 @@
         </div>
 
         <div class="feature-grid">
-            <div class="feature-card">
-                <title> {{ videos.title }} </title>
-                <video width="300" height="150" controls>
-                    <source src="" type="video/mp4">
-                </video>
-                <div>
-                    <h3>Star Player Watch</h3>
-                    <p>Track top performances, runs, wickets, strike rate, and match-winning moments.</p>
-                </div>
-            </div>
+
+
+            {% video item.video as ipl_video %}
+                    <div class="feature-card">
+                        <title>{{ item.title }}</title>
+
+                        <!-- Embed actual video player -->
+                        {% video ipl_video "300x150" %}
+
+                        <div>
+                            <h3>Star Player Watch</h3>
+                            <p>Track top performances, runs, wickets, strike rate, and match-winning moments.</p>
+                        </div>
+                    </div>
+            {% endvideo %}
 
             <div class="feature-card">
                 <img src="{% static 'pl/img/cmp1.avif' %}" alt="Match preview">
