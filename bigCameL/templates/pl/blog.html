@@ -12,9 +12,13 @@
         {{ b }}
     </p>
     {% endfor %}
+    <br>
     <div class="btns">
-    <a class="prev" href="{% url 'full_blog' team_id|add:-1 %}"><span>&laquo</span> Previous</a>
-    <a class="next" href="{% url 'full_blog' team_id|add:1 %}">Next<span>&raquo</span></a>
+        <a class="prev" href="{% url 'full_blog' team_id|add:-1 %}"><span>&laquo</span> Previous</a>
+            {% for c in champs_count %}
+                <a class="#" href="{% url 'full_blog' c %}">{{ c }}</a>
+            {% endfor %}
+        <a class="next" href="{% url 'full_blog' team_id|add:1 %}">Next<span>&raquo</span></a>
     </div>
 {% endif %}
 

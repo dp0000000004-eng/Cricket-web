@@ -20,14 +20,15 @@
         {% for fam in fams %}
         
 
-
-            <div class="feature-card">
-                <img src="{{ fam.fan_image.url }}">
-                <div>
-                    <h3>{{ fam.title }}</h3>
-                    <p>{{ fam.descriptions }}</p>
+            <a href="{% url 'delete_fam' fam.id %}" >
+                <div class="feature-card">
+                    <img src="{{ fam.fan_image.url }}">
+                    <div>
+                        <h3>{{ fam.title }}</h3>
+                        <p>{{ fam.descriptions }}</p>
+                    </div>
                 </div>
-            </div>
+            </a>
         {% empty %}
 
             <h2>Be The First Person To Start The Day</h2>

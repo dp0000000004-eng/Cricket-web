@@ -169,3 +169,4 @@ class IPLMeta(models.Model):
 
     def __str__(self):
         return f"{self.total_team} {self.total_matches} {self.total_venue}"
+    

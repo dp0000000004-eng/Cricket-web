@@ -36,7 +36,11 @@
             {% endif %}
             <a href="{% url 'createAccount' %}" class="nav-item" id="nav-create_a_c">Create account</a>
             <a href="{% url 'blog' %}" class="nav-item" id="nav-champs">Blog</a>
-            <a href="{% url 'login' %}" class="nav-item" id="nav-login">Login<i class="fa-solid fa-user user-icon"></i></a>
+            {% if user.is_authenticated %}
+                <a href="{% url 'logout' %}" class="nav-item">Log out</a>
+            {% else %}
+                <a href="{% url 'login' %}" class="nav-item">Log in</a>
+            {% endif %}
             <a href="{% url 'fam' %}" class="nav-item" id="nav-fam">Fam's</a>
 
             </nav>
@@ -57,7 +61,6 @@
     <footer>
         <div class="credits">
             <span>Built and designed by <a href="https://www.instagram.com/debazj" target="_blank" >deba</a> </span><br>
-            <a href="{% url 'logout' %}">Logout</a>
         </div>
     </footer>
 </html>

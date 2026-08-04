@@ -2,24 +2,22 @@ from django.shortcuts import render, redirect
 from .models import Teams, Players, Matches, Venues, About_venue, TotalSit, Video, Champs, Blog, SitPrice, FanOfIPL, IPLMeta
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
+from django.forms.models import model_to_dict
 from .forms import BookingForm, UserForm, FamForm
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 import random
-
-
-# Create your views here.
-
+import json
 
 
 def team_view(request):
     teams = Teams.objects.all()
     return render(request, "pl/teams.html", {"teams":teams})
 
-
 def player_view(request, team_id):
     players = Players.objects.filter(team=team_id)
     return render(request, "pl/players.html", {"players":players})
+
 
 def login_view(request):
     if request.user.is_authenticated:
@@ -61,14 +59,16 @@ def venue_view(request):
 def booking(request):
     if request.user.is_authenticated:
 
+        user = User.objects.filter(id=request.user.id)
+        user_data = json.dumps(model_to_dict(user))
 
 
         greetMsg = [
                     "welcome ",
                     "Have a Good day ",
-                    "hello, ",
+                    "Hello, ",
                     "nice coffe, "
-                ]
+        ]
         
 
         sit_left = TotalSit.objects.first().sit_available
@@ -79,7 +79,7 @@ def booking(request):
         if sit_left == nothing_left:
             info_msg = messages.info(request, message="No sit available")
             return render(request, "pl/book.html" , {"info_msg":info_msg})
-
+        
 
         sit_available = TotalSit.objects.all()
 
@@ -98,7 +98,8 @@ def booking(request):
                 else:
                     form = BookingForm()
 
-        return render(request, "pl/book.html" , {"form":BookingForm(request.POST), "total_available":sit_available, "vip_price":vip_sit_price, "normal_price":normal_sit_price, "greet":random.choice(greetMsg)})
+        return render(request, "pl/book.html" , {"form":BookingForm(request.POST), 
+                                                 "total_available":sit_available, "vip_price":vip_sit_price, "normal_price":normal_sit_price, "greet":random.choice(greetMsg), "user_data":user_data})
     else:
         return redirect("login")
 
@@ -125,7 +126,15 @@ def champs(request):
     return render(request, "pl/champs.html" ,{"champs":champs})
 
 def blog_view(request, team_id):
+    champs_ = Champs.objects.all().count()
+    champs_count = []
+
+    for c in range(champs_):
+        champs_count.append(c+1)
+
+    
     last_count = Champs.objects.count()
+
     if team_id > last_count:
         return redirect('blog')
     if team_id <= last_count:
@@ -133,7 +142,16 @@ def blog_view(request, team_id):
         if team_id == 0:
             return redirect('blog')
         
-        return render(request, "pl/blog.html", {"blog":blog, "team_id":team_id, "last_count":last_count})
+        return render(
+            request, 
+            "pl/blog.html", 
+            {
+            "blog":blog, 
+            "team_id":team_id, 
+            "last_count":last_count, 
+            "champs_count":champs_count
+            }
+        )
 
 
 def fam_view(request):
@@ -169,4 +187,10 @@ def fam_view(request):
         return render(request, "pl/fam.html", {"form":form, "greetings":random.choice(greetings), "fams":fams})
     else:
         return redirect('login')
-    
+
+@login_required
+def delete_fan_data(request, fan_id):
+    fan = FanOfIPL.objects.get(id=fan_id)
+
+    fan.delete()
+    return redirect("fam")

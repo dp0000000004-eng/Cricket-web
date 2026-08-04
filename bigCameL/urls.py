@@ -1,9 +1,10 @@
+
 from django.urls import path
 from . import views
 
 
 urlpatterns = [
-    path("login", views.login_view, name="login"),
+    path("login/", views.login_view, name="login"),
     path("", views.home, name="home"),
     path("teams/", views.team_view, name="team_view"),
     path("players/<int:team_id>/", views.player_view, name="player_view"),
@@ -15,5 +16,6 @@ urlpatterns = [
     path("logout/", views.logout_view, name="logout"),
     path("champs/", views.champs, name="blog"),
     path("blog/<int:team_id>/", views.blog_view, name="full_blog"),
-    path("fam/", views.fam_view, name="fam")
+    path("fam/", views.fam_view, name="fam"),
+    path("Delete/<int:fan_id>", views.delete_fan_data, name="delete_fam"),
 ]
