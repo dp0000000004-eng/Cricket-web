@@ -7,7 +7,7 @@ from .forms import BookingForm, UserForm, FamForm
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 import random
-import json
+
 
 
 def team_view(request):
@@ -22,13 +22,14 @@ def player_view(request, team_id):
 def login_view(request):
     if request.user.is_authenticated:
         redirect('home')
+
     if request.method == "POST":
         username = request.POST.get('username')
         password = request.POST.get('password')
         user = authenticate(request, username=username, password=password)
         if user is not None:
             login(request, user)
-            return redirect('book')
+            return reversed()
         else:
             messages.error(request, message="Invalid Username or password!")
 
@@ -59,15 +60,19 @@ def venue_view(request):
 def booking(request):
     if request.user.is_authenticated:
 
-        user = User.objects.filter(id=request.user.id)
-        user_data = json.dumps(model_to_dict(user))
+        c_username = request.user.username
+        email = request.user.email
 
+        user_data = {
+            "username":c_username,
+            "email":email
+        }
 
         greetMsg = [
-                    "welcome ",
-                    "Have a Good day ",
-                    "Hello, ",
-                    "nice coffe, "
+            "welcome ",
+            "Have a Good day ",
+            "Hello, ",
+            "nice coffe, "
         ]
         
 
@@ -91,20 +96,27 @@ def booking(request):
                 form = BookingForm(request.POST)
                 if form.is_valid():
                     book = form.save(commit=False)
-                    book.username = request.user
+                    book.user_data = user_data
                     book.save()
                     messages.success(request, message="Thank's For Booking")
                     form = BookingForm()
                 else:
                     form = BookingForm()
 
-        return render(request, "pl/book.html" , {"form":BookingForm(request.POST), 
-                                                 "total_available":sit_available, "vip_price":vip_sit_price, "normal_price":normal_sit_price, "greet":random.choice(greetMsg), "user_data":user_data})
+        return render(request, "pl/book.html" , {
+            "form":BookingForm(request.POST), 
+            "total_available":sit_available,
+            "vip_price":vip_sit_price, 
+            "normal_price":normal_sit_price, 
+            "greet":random.choice(greetMsg), 
+            "user_data":request.user.username
+        })
     else:
         return redirect("login")
 
 
 def createAccount(request):
+
     if request.method == "POST":
         username = request.POST.get("username")
         email = request.POST.get("email")

@@ -101,8 +101,8 @@ class TotalSit(models.Model):
         return f" {self.sit_available} {self.vip} {self.normal}"
     
 class TotalBooked(models.Model):
+    user_data = models.JSONField(null=True, blank=True)
     sit = models.ForeignKey(TotalSit, on_delete=models.CASCADE, related_name="sit_book", default=TotalSit.objects.first)
-    username = models.ForeignKey(User, on_delete=models.CASCADE, related_name="user_book", null=True)
     total_booked = models.IntegerField(blank=True, null=True)
     vip = models.IntegerField(blank=True, null=True, default=0)
     normal = models.IntegerField(blank=True, null=True, default=0)

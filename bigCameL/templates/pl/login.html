@@ -21,7 +21,9 @@
             <input class="input-cls" type="text" name="username" placeholder="Username"><br>
             <lable class="lbl-cls">Password: </lable><br>
             <input class="input-cls" type="password" name="password" placeholder="password"><br>
-            <input class="login-btn" type="submit" placeholder="Login">
+            <input class="login-btn" type="submit" value="Login" ><br>
+            <h5 class="signIn">If not have a account create a Account by click below</h5><br>
+            <a href="{% url 'createAccount' %}">Sign In</a>
         </form>
     </div>
   </body>

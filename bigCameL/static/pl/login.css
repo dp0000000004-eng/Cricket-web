@@ -48,8 +48,12 @@ body {
   color: #555;
 }
 
+.signIn {
+  
+}
+
 .input-cls:focus {
-  border-color: #1D9E75;
+  border-color: #1a73e8;
   box-shadow: 0 0 0 3px rgba(29, 158, 117, 0.12);
 }
 
@@ -58,7 +62,7 @@ body {
   width: 100%;
   height: 38px;
   margin-top: 1.5rem;
-  background: #1D9E75;
+  background: #1a73e8;
   color: #fff;
   border: none;
   border-radius: 8px;
@@ -69,7 +73,7 @@ body {
 }
 
 .login-btn:hover {
-  background: #0F6E56;
+  background: #1a73e8;
 }
 
 .login-btn:active {
