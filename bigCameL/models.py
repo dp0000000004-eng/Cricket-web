@@ -1,7 +1,6 @@
 from django.db import models
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.contrib.auth.models import User
-from embed_video.fields import EmbedVideoField
 from django.core.exceptions import ValidationError
 # Create your models here.
 
@@ -128,14 +127,7 @@ class TotalBooked(models.Model):
 
     def __str__(self):
         return f"{self.total_booked} {self.vip} {self.normal} {self.total_price}"
-    
-class Video(models.Model):
-    title = models.CharField(max_length=512)
-    video_url = EmbedVideoField()
 
-    def __str__(self):
-        return self.title
-    
 
 class Champs(models.Model):
     year = models.IntegerField()

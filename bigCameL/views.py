@@ -1,208 +1,110 @@
-from django.shortcuts import render, redirect
-from .models import Teams, Players, Matches, Venues, About_venue, TotalSit, Video, Champs, Blog, SitPrice, FanOfIPL, IPLMeta
-from django.contrib.auth import authenticate, login, logout
-from django.contrib import messages
+from rest_framework.response import Response
+from .models import Teams, Players, Matches, Venues, TotalSit, Champs, SitPrice, FanOfIPL, IPLMeta, City, Blog
 from django.forms.models import model_to_dict
-from .forms import BookingForm, UserForm, FamForm
-from django.contrib.auth.decorators import login_required
-from django.contrib.auth.models import User
-import random
+from rest_framework import status
+from rest_framework.decorators import api_view
+
+@api_view()
+def blog_view(request):
+
+    blogs = Blog.objects.all()
+
+    blogs_obj = [model_to_dict(blog)for blog in blogs]
+
+    return Response(blogs_obj, status=status.HTTP_200_OK)
 
 
+@api_view()
+def city_view(request):
+    cities = City.objects.all()
 
+    cities_obj = [model_to_dict(city)for city in cities]
+
+    return Response(cities_obj, status=status.HTTP_200_OK)
+
+@api_view()
 def team_view(request):
+
     teams = Teams.objects.all()
-    return render(request, "pl/teams.html", {"teams":teams})
 
+    teams_obj = [model_to_dict(team)for team in teams]
+
+    return Response(teams_obj, status=status.HTTP_200_OK)
+
+
+@api_view()
 def player_view(request, team_id):
+
     players = Players.objects.filter(team=team_id)
-    return render(request, "pl/players.html", {"players":players})
+
+    players_obj = [model_to_dict(player)for player in players]
+
+    return Response(players_obj, status=status.HTTP_200_OK)
 
 
-def login_view(request):
-    if request.user.is_authenticated:
-        redirect('home')
-
-    if request.method == "POST":
-        username = request.POST.get('username')
-        password = request.POST.get('password')
-        user = authenticate(request, username=username, password=password)
-        if user is not None:
-            login(request, user)
-            return reversed()
-        else:
-            messages.error(request, message="Invalid Username or password!")
-
-    return render(request, "pl/login.html")
-
-
-
+@api_view()
 def home(request):
 
-    ipl = IPLMeta.objects.all()[0]
-    videos = Video.objects.all()
+    ipl = IPLMeta.objects.all()
 
-    return render(request, "pl/home.html", {"videos":videos, "ipl":ipl})
+    ipl_obj = [model_to_dict(pl)for pl in ipl]
 
-def about_venue(request, venue_id):
-    about_venues = About_venue.objects.filter(id=venue_id)
-    return render(request, "pl/about_venue.html", {"about_venues":about_venues})
+    return Response(ipl_obj, status=status.HTTP_200_OK)
 
+@api_view()
 def matches_view(request):
+
     matches = Matches.objects.all()
-    return render(request, "pl/matches.html", {"matches":matches})
+
+    matches_obj = [model_to_dict(match)for match in matches]
+
+    return Response(matches_obj, status=status.HTTP_200_OK)
+
 
 def venue_view(request):
     venues = Venues.objects.all()
-    return render(request, "pl/venues.html", {"venues":venues})
+
+    venues_obj = [model_to_dict(venue)for venue in venues]
 
 
+
+#   ERROR IN THIS FUNCTION
+@api_view()
 def booking(request):
-    if request.user.is_authenticated:
+    
 
-        c_username = request.user.username
-        email = request.user.email
+    sit_left = TotalSit.objects.first().sit_available
+    vip_sit_price = SitPrice.objects.all()[0].price
+    normal_sit_price = SitPrice.objects.all()[1].pricern 
+    
 
-        user_data = {
-            "username":c_username,
-            "email":email
-        }
+    sit_available = TotalSit.objects.all()
 
-        greetMsg = [
-            "welcome ",
-            "Have a Good day ",
-            "Hello, ",
-            "nice coffe, "
-        ]
-        
+    context = {
+        [model_to_dict(sit_left)],
+        [model_to_dict(vip_sit_price)],
+        [model_to_dict(normal_sit_price)],
 
-        sit_left = TotalSit.objects.first().sit_available
-        vip_sit_price = SitPrice.objects.all()[0].price
-        normal_sit_price = SitPrice.objects.all()[1].price
-        nothing_left = 0
+    }
 
-        if sit_left == nothing_left:
-            info_msg = messages.info(request, message="No sit available")
-            return render(request, "pl/book.html" , {"info_msg":info_msg})
-        
-
-        sit_available = TotalSit.objects.all()
-
-        if sit_left != nothing_left:
-            if request.method == "POST":
+    return Response(context, status=status.HTTP_200_OK)
 
 
-
-                form = BookingForm(request.POST)
-                if form.is_valid():
-                    book = form.save(commit=False)
-                    book.user_data = user_data
-                    book.save()
-                    messages.success(request, message="Thank's For Booking")
-                    form = BookingForm()
-                else:
-                    form = BookingForm()
-
-        return render(request, "pl/book.html" , {
-            "form":BookingForm(request.POST), 
-            "total_available":sit_available,
-            "vip_price":vip_sit_price, 
-            "normal_price":normal_sit_price, 
-            "greet":random.choice(greetMsg), 
-            "user_data":request.user.username
-        })
-    else:
-        return redirect("login")
-
-
-def createAccount(request):
-
-    if request.method == "POST":
-        username = request.POST.get("username")
-        email = request.POST.get("email")
-        raw_password = request.POST.get("password")
-        user = User(username=username, email=email)
-        user.set_password(raw_password)
-        user.save()
-        messages.success(request, message="Account Created")
-    return render(request, "pl/create_a_c.html", {"form":UserForm(request.POST)})
-
-@login_required
-def logout_view(request):
-    logout(request)
-    return redirect("login")
-
-
+@api_view()
 def champs(request):
     champs = Champs.objects.all()
-    return render(request, "pl/champs.html" ,{"champs":champs})
 
-def blog_view(request, team_id):
-    champs_ = Champs.objects.all().count()
-    champs_count = []
+    champs_obj = [model_to_dict(champ) for champ in champs]
 
-    for c in range(champs_):
-        champs_count.append(c+1)
-
-    
-    last_count = Champs.objects.count()
-
-    if team_id > last_count:
-        return redirect('blog')
-    if team_id <= last_count:
-        blog = Blog.objects.filter(year=team_id)
-        if team_id == 0:
-            return redirect('blog')
-        
-        return render(
-            request, 
-            "pl/blog.html", 
-            {
-            "blog":blog, 
-            "team_id":team_id, 
-            "last_count":last_count, 
-            "champs_count":champs_count
-            }
-        )
+    return Response(champs_obj, status=status.HTTP_200_OK)
 
 
+@api_view()
 def fam_view(request):
 
-    if request.user.is_authenticated:
 
-        fams = FanOfIPL.objects.all()
+    fams = FanOfIPL.objects.all()
 
-        greetings = [
-            "Thanks for the love, have a nice day!",
-            "Wishing you joy and sunshine all day long!",
-            "Stay positive, stay happy, stay blessed!",
-            "Good vibes only — keep smiling!",
-            "May your day be filled with peace and laughter!",
-            "Sending warm wishes your way!",
-            "Happiness looks good on you — enjoy your day!",
-            "Gratitude makes the day brighter!",
-            "Cheers to a wonderful day ahead!",
-            "Keep shining, the world needs your light!"
-        ]
+    fams_obj = [model_to_dict(fam)for fam in fams]
 
-
-        if request.method == 'POST':
-            form = FamForm(request.POST, request.FILES)
-            if form.is_valid():
-                fam = form.save(commit=False)
-                fam.username = request.user
-                fam.save()
-                messages.success(request, "Done  ")
-                return redirect("fam")
-        else:
-            form = FamForm()
-        return render(request, "pl/fam.html", {"form":form, "greetings":random.choice(greetings), "fams":fams})
-    else:
-        return redirect('login')
-
-@login_required
-def delete_fan_data(request, fan_id):
-    fan = FanOfIPL.objects.get(id=fan_id)
-
-    fan.delete()
-    return redirect("fam")
+    return Response(fams_obj, status=status.HTTP_200_OK)
