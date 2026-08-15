@@ -6,6 +6,9 @@ from django.forms.models import model_to_dict
 from .forms import BookingForm, UserForm, FamForm
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
+import requests
+from dotenv import load_dotenv
+import os
 import random
 
 
@@ -39,10 +42,40 @@ def login_view(request):
 
 def home(request):
 
+    load_dotenv()
+
+    api_key = os.getenv('WEATHER_API_KEY')
+
+    lat = 20.82995822420193
+    lon = 85.05696466179847
+
+    url = f"https://api.openweathermap.org/data/2.5/forecast?lat={lat}&lon={lon}&units=metric&appid={api_key}"
+
+    response = requests.get(url)
+
+    data = response.json()
+
+    Temp = data['list'][0]['main']['temp']
+    Weather = data["list"][0]["weather"][0]["description"]
+    Wind_speed = data["list"][0]["wind"]["speed"]
+
+
     ipl = IPLMeta.objects.all()[0]
     videos = Video.objects.all()
 
-    return render(request, "pl/home.html", {"videos":videos, "ipl":ipl})
+
+    return render(
+        request, 
+        "pl/home.html", 
+        {
+            "videos":videos, 
+            "ipl":ipl,
+            "temp":Temp,
+            "wethr_desc":Weather,
+            "wind":Wind_speed
+        }
+    )
+
 
 def about_venue(request, venue_id):
     about_venues = About_venue.objects.filter(id=venue_id)
