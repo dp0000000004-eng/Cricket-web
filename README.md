@@ -39,5 +39,5 @@ python manage.py runserver
 # pull Requests
 All Are welcome❤️
 
-## Authr
+## Author
 - Debasish
