@@ -7,6 +7,8 @@ from .forms import BookingForm, UserForm, FamForm
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 import requests
+from urllib3.exceptions import NameResolutionError
+from django.http import JsonResponse
 from dotenv import load_dotenv
 import os
 import random
@@ -24,15 +26,18 @@ def player_view(request, team_id):
 
 def login_view(request):
     if request.user.is_authenticated:
-        redirect('home')
+        return redirect('home')
 
     if request.method == "POST":
         username = request.POST.get('username')
         password = request.POST.get('password')
         user = authenticate(request, username=username, password=password)
+
+        back_path = f"{request.POST.get('next') or request.GET.get('next') or 'home'}"
+
         if user is not None:
             login(request, user)
-            return reversed()
+            return redirect(back_path)
         else:
             messages.error(request, message="Invalid Username or password!")
 
@@ -49,15 +54,24 @@ def home(request):
     lat = 20.82995822420193
     lon = 85.05696466179847
 
-    url = f"https://api.openweathermap.org/data/2.5/forecast?lat={lat}&lon={lon}&units=metric&appid={api_key}"
 
-    response = requests.get(url)
+    
+    try:
+        url = f"https://api.openweathermap.org/data/2.5/forecast?lat={lat}&lon={lon}&units=metric&appid={api_key}"
+        response = requests.get(url)
+        data = response.json()
 
-    data = response.json()
+        global Temp
+        
+        Temp = data['list'][0]['main']['temp'] or None
+        Weather = data["list"][0]["weather"][0]["description"] or None
+        Wind_speed = data["list"][0]["wind"]["speed"] or None
+    except requests.exceptions.ConnectionError :
+        pass
 
-    Temp = data['list'][0]['main']['temp']
-    Weather = data["list"][0]["weather"][0]["description"]
-    Wind_speed = data["list"][0]["wind"]["speed"]
+       
+
+    
 
 
     ipl = IPLMeta.objects.all()[0]
@@ -65,14 +79,15 @@ def home(request):
 
 
     return render(
+
         request, 
         "pl/home.html", 
         {
             "videos":videos, 
             "ipl":ipl,
-            "temp":Temp,
-            "wethr_desc":Weather,
-            "wind":Wind_speed
+            "temp":Temp or None,
+            "wethr_desc":Weather or None,
+            "wind":Wind_speed or None
         }
     )
 
@@ -163,7 +178,7 @@ def createAccount(request):
 @login_required
 def logout_view(request):
     logout(request)
-    return redirect("login")
+    return redirect("home")
 
 
 def champs(request):

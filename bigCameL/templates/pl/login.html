@@ -17,6 +17,7 @@
     <div class="form-c">
         <form method="POST">
             {% csrf_token %}
+            <input type="hidden" name="next" value="{{ request.GET.next }}">
             <lable class="lbl-cls">Username: </lable><br>
             <input class="input-cls" type="text" name="username" placeholder="Username"><br>
             <lable class="lbl-cls">Password: </lable><br>
