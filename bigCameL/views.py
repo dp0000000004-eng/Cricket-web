@@ -2,22 +2,33 @@ from django.shortcuts import render, redirect
 from .models import Teams, Players, Matches, Venues, About_venue, TotalSit, Video, Champs, Blog, SitPrice, FanOfIPL, IPLMeta
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
-from django.forms.models import model_to_dict
 from .forms import BookingForm, UserForm, FamForm
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 import requests
-from urllib3.exceptions import NameResolutionError
-from django.http import JsonResponse
+from rest_framework.renderers import TemplateHTMLRenderer, JSONRenderer
+from rest_framework.decorators import api_view, renderer_classes
 from dotenv import load_dotenv
 import os
+from .serializers import TeamsSerializer
 import random
+from rest_framework_xml.renderers import XMLRenderer
+from rest_framework.response import Response
 
 
-
+@api_view(['GET', 'POST'])
+@renderer_classes([TemplateHTMLRenderer, JSONRenderer, XMLRenderer])
 def team_view(request):
     teams = Teams.objects.all()
-    return render(request, "pl/teams.html", {"teams":teams})
+    teams_serializer = TeamsSerializer(teams, many=True)
+    return Response(
+        {
+            'teams':teams_serializer.data
+        },
+        template_name='pl/teams.html'
+    )
+
+
 
 def player_view(request, team_id):
     players = Players.objects.filter(team=team_id)
@@ -175,7 +186,6 @@ def createAccount(request):
         messages.success(request, message="Account Created")
     return render(request, "pl/create_a_c.html", {"form":UserForm(request.POST)})
 
-@login_required
 def logout_view(request):
     logout(request)
     return redirect("home")
@@ -248,7 +258,6 @@ def fam_view(request):
     else:
         return redirect('login')
 
-@login_required
 def delete_fan_data(request, fan_id):
     fan = FanOfIPL.objects.get(id=fan_id)
 
