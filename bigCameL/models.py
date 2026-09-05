@@ -19,14 +19,14 @@ class Teams(models.Model):
     code = models.CharField(max_length=10)
 
     def __str__(self):
-        return f"{self.team_name} {self.code}"
+        return f"{self.team_name}"
     
 class Official_code_of_playertype(models.Model):
     _type = models.CharField(max_length=24)
     code = models.CharField(max_length=10)
 
     def __str__(self):
-        return f"{self._type} {self.code}"
+        return f"{self.code}"
     
 class Venues(models.Model):
     venue_name = models.CharField(max_length=64)

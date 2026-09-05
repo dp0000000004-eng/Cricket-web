@@ -48,6 +48,8 @@ class VenuesSerializer(serializers.ModelSerializer):
         fields = ['id', 'venue_name', 'code', 'city', 'home_ground_of']
 
 class PlayerSerializer(serializers.ModelSerializer):
+    team = serializers.StringRelatedField()
+    code = serializers.StringRelatedField()
     class Meta:
         model = Players
         fields = ['id', 'player_name', 'jersey_no', 'is_overseas' , 'is_captain', 'team', 'code']
