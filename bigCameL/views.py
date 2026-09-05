@@ -33,7 +33,7 @@ def team_view(request):
 @api_view(['POST', 'GET'])
 @renderer_classes([TemplateHTMLRenderer, JSONRenderer, XMLRenderer])
 def player_view(request, team_id):
-    players = Players.objects.filter(team=team_id)
+    players = Players.objects.filter(team=team_id).select_related('team', 'code').all()
     playersSerializer = PlayerSerializer(players, many=True)
     return Response({'players':playersSerializer.data} ,template_name="pl/players.html")
 
