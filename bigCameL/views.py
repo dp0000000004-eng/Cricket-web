@@ -10,10 +10,11 @@ from rest_framework.renderers import TemplateHTMLRenderer, JSONRenderer
 from rest_framework.decorators import api_view, renderer_classes
 from dotenv import load_dotenv
 import os
-from .serializers import TeamsSerializer
+from .serializers import TeamsSerializer, VideoSerializers, MetaSerializer
 import random
 from rest_framework_xml.renderers import XMLRenderer
 from rest_framework.response import Response
+from .serializers import VenuesSerializer, PlayerSerializer
 
 
 @api_view(['GET', 'POST'])
@@ -29,10 +30,12 @@ def team_view(request):
     )
 
 
-
+@api_view(['POST', 'GET'])
+@renderer_classes([TemplateHTMLRenderer, JSONRenderer, XMLRenderer])
 def player_view(request, team_id):
     players = Players.objects.filter(team=team_id)
-    return render(request, "pl/players.html", {"players":players})
+    playersSerializer = PlayerSerializer(players, many=True)
+    return Response({'players':playersSerializer.data} ,template_name="pl/players.html")
 
 
 def login_view(request):
@@ -55,7 +58,8 @@ def login_view(request):
     return render(request, "pl/login.html")
 
 
-
+@api_view(['POST', 'GET'])
+@renderer_classes([TemplateHTMLRenderer, JSONRenderer, XMLRenderer])
 def home(request):
 
     load_dotenv()
@@ -64,6 +68,9 @@ def home(request):
 
     lat = 20.82995822420193
     lon = 85.05696466179847
+    Temp = None
+    Weather = None
+    Wind_speed = None
 
 
     
@@ -72,7 +79,6 @@ def home(request):
         response = requests.get(url)
         data = response.json()
 
-        global Temp
         
         Temp = data['list'][0]['main']['temp'] or None
         Weather = data["list"][0]["weather"][0]["description"] or None
@@ -80,26 +86,23 @@ def home(request):
     except requests.exceptions.ConnectionError :
         pass
 
-       
-
-    
-
-
-    ipl = IPLMeta.objects.all()[0]
+    ipl = IPLMeta.objects.all()
     videos = Video.objects.all()
+    metaSerializer = MetaSerializer(ipl, many=True)
+    videosSerializer = VideoSerializers(videos, many=True)
 
 
-    return render(
+    return Response(
 
-        request, 
-        "pl/home.html", 
         {
-            "videos":videos, 
-            "ipl":ipl,
+            "videos":videosSerializer.data, 
+            "ipl":metaSerializer.data,
             "temp":Temp or None,
             "wethr_desc":Weather or None,
             "wind":Wind_speed or None
-        }
+        },
+
+        template_name='pl/home.html'
     )
 
 
@@ -111,9 +114,20 @@ def matches_view(request):
     matches = Matches.objects.all()
     return render(request, "pl/matches.html", {"matches":matches})
 
+
+@api_view(['POST', 'GET'])
+@renderer_classes([TemplateHTMLRenderer, JSONRenderer, XMLRenderer])
 def venue_view(request):
     venues = Venues.objects.all()
-    return render(request, "pl/venues.html", {"venues":venues})
+    venuesSerializer = VenuesSerializer(venues, many=True)
+    return Response(
+        
+        {
+            "venues":venuesSerializer.data
+        },
+
+        template_name="pl/venues.html"
+    )
 
 
 def booking(request):
