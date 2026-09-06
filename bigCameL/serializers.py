@@ -2,7 +2,8 @@ from .models import City, Teams, Video, IPLMeta
 from rest_framework import serializers
 from .models import Official_code_of_playertype
 from .models import Venues, Players, Matches
-from .models import About_venue
+from .models import About_venue, Blog, Champs
+from .models import FanOfIPL
 
 
 
@@ -36,12 +37,6 @@ class Official_code_of_playertypeSerializer(serializers.ModelSerializer):
         fields = ['id', '_type', 'code']
 
 
-class About_venueSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = About_venue
-        fields = ['id', 'venue_name', 'venue_people_capa', 'venue_width', 'description']
-
-
 class VenuesSerializer(serializers.ModelSerializer):
     class Meta:
         model = Venues
@@ -53,3 +48,41 @@ class PlayerSerializer(serializers.ModelSerializer):
     class Meta:
         model = Players
         fields = ['id', 'player_name', 'jersey_no', 'is_overseas' , 'is_captain', 'team', 'code']
+
+
+class AboutVenueSerializer(serializers.ModelSerializer):
+    venue_name = serializers.StringRelatedField()
+    class Meta:
+        model = About_venue
+        fields = ['id', 'venue_name', 'venue_people_capa', 'venue_width', 'description']
+
+
+class ChampsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Champs
+        fields = ['id', 'year', 'champs']
+
+
+class BlogSerializer(serializers.ModelSerializer):
+    year = serializers.StringRelatedField()
+    class Meta:
+        model = Blog
+        fields = ['id', 'year', 'Blog']
+
+
+class MatchesSerializer(serializers.ModelSerializer):
+    team1 = serializers.StringRelatedField()
+    team2 = serializers.StringRelatedField()
+    venues = serializers.StringRelatedField()
+    home_of = serializers.StringRelatedField()
+    city = serializers.StringRelatedField()
+    class Meta:
+        model = Matches
+        fields = ['id', 'team1', 'team2', 'venues', 'home_of', 'date_time', 'city']
+
+
+class FamSerializer(serializers.ModelSerializer):
+    username = serializers.StringRelatedField()
+    class Meta:
+        model = FanOfIPL
+        fields = ['id', 'username', 'email', 'title' , 'fan_image', 'descriptions']

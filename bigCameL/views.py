@@ -14,11 +14,15 @@ from .serializers import TeamsSerializer, VideoSerializers, MetaSerializer
 import random
 from rest_framework_xml.renderers import XMLRenderer
 from rest_framework.response import Response
-from .serializers import VenuesSerializer, PlayerSerializer
+from .serializers import VenuesSerializer, PlayerSerializer, AboutVenueSerializer
+from rest_framework_yaml.renderers import YAMLRenderer
+from rest_framework_csv.renderers import CSVRenderer
+from .serializers import ChampsSerializer, BlogSerializer, MatchesSerializer
+from .serializers import FamSerializer
 
 
 @api_view(['GET', 'POST'])
-@renderer_classes([TemplateHTMLRenderer, JSONRenderer, XMLRenderer])
+@renderer_classes([TemplateHTMLRenderer, JSONRenderer, XMLRenderer, CSVRenderer])
 def team_view(request):
     teams = Teams.objects.all()
     teams_serializer = TeamsSerializer(teams, many=True)
@@ -31,9 +35,9 @@ def team_view(request):
 
 
 @api_view(['POST', 'GET'])
-@renderer_classes([TemplateHTMLRenderer, JSONRenderer, XMLRenderer])
+@renderer_classes([TemplateHTMLRenderer, JSONRenderer, XMLRenderer, YAMLRenderer, CSVRenderer])
 def player_view(request, team_id):
-    players = Players.objects.filter(team=team_id).select_related('team', 'code').all()
+    players = Players.objects.filter(team=team_id).select_related(          'team', 'code').all()
     playersSerializer = PlayerSerializer(players, many=True)
     return Response({'players':playersSerializer.data} ,template_name="pl/players.html")
 
@@ -64,7 +68,7 @@ def home(request):
 
     load_dotenv()
 
-    api_key = os.getenv('WEATHER_API_KEY')
+    api_key = "76ebe517808963e9bcbfd579a75c3568"
 
     lat = 20.82995822420193
     lon = 85.05696466179847
@@ -79,10 +83,6 @@ def home(request):
         response = requests.get(url)
         data = response.json()
 
-        
-        Temp = data['list'][0]['main']['temp'] or None
-        Weather = data["list"][0]["weather"][0]["description"] or None
-        Wind_speed = data["list"][0]["wind"]["speed"] or None
     except requests.exceptions.ConnectionError :
         pass
 
@@ -95,6 +95,7 @@ def home(request):
     return Response(
 
         {
+            'data':data,
             "videos":videosSerializer.data, 
             "ipl":metaSerializer.data,
             "temp":Temp or None,
@@ -106,13 +107,28 @@ def home(request):
     )
 
 
+
+@api_view(['POST', 'GET'])
+@renderer_classes([TemplateHTMLRenderer, JSONRenderer, XMLRenderer, CSVRenderer])
 def about_venue(request, venue_id):
     about_venues = About_venue.objects.filter(id=venue_id)
-    return render(request, "pl/about_venue.html", {"about_venues":about_venues})
+    about_venueSerializer = AboutVenueSerializer(about_venues, many=True)
+    
+    return Response(
+        {
+            'about_venues':about_venueSerializer,
+        }
+        ,
+        template_name='pl/venues.html'
+    )
 
+
+@api_view(['POST', 'GET'])
+@renderer_classes([TemplateHTMLRenderer, JSONRenderer, XMLRenderer, CSVRenderer])
 def matches_view(request):
     matches = Matches.objects.all()
-    return render(request, "pl/matches.html", {"matches":matches})
+    matchesSerializer = MatchesSerializer(matches, many=True)
+    return Response({"matches":matchesSerializer.data}, template_name="pl/matches.html")
 
 
 @api_view(['POST', 'GET'])
@@ -205,10 +221,17 @@ def logout_view(request):
     return redirect("home")
 
 
+
+@api_view(['POST', 'GET'])
+@renderer_classes([TemplateHTMLRenderer, JSONRenderer, XMLRenderer, YAMLRenderer, CSVRenderer])
 def champs(request):
     champs = Champs.objects.all()
-    return render(request, "pl/champs.html" ,{"champs":champs})
+    champsSerializer = ChampsSerializer(champs, many=True)
+    return Response({"champs":champsSerializer.data}, template_name="pl/champs.html")
 
+
+@api_view(['POST', 'GET'])
+@renderer_classes([TemplateHTMLRenderer, JSONRenderer, XMLRenderer, YAMLRenderer, CSVRenderer])
 def blog_view(request, team_id):
     champs_ = Champs.objects.all().count()
     champs_count = []
@@ -223,26 +246,30 @@ def blog_view(request, team_id):
         return redirect('blog')
     if team_id <= last_count:
         blog = Blog.objects.filter(year=team_id)
+        blogSerializer = BlogSerializer(blog, many=False)
         if team_id == 0:
             return redirect('blog')
         
-        return render(
-            request, 
-            "pl/blog.html", 
+        return Response(
             {
-            "blog":blog, 
+            "blog":blogSerializer.data, 
             "team_id":team_id, 
             "last_count":last_count, 
             "champs_count":champs_count
-            }
+            },
+            template_name='pl/blog.html'
         )
 
 
+
+@api_view(['POST', 'GET'])
+@renderer_classes([TemplateHTMLRenderer, JSONRenderer, XMLRenderer, YAMLRenderer, CSVRenderer])
 def fam_view(request):
 
     if request.user.is_authenticated:
 
         fams = FanOfIPL.objects.all()
+        famSerializer = FamSerializer(fams, many=True)
 
         greetings = [
             "Thanks for the love, have a nice day!",
@@ -268,9 +295,18 @@ def fam_view(request):
                 return redirect("fam")
         else:
             form = FamForm()
-        return render(request, "pl/fam.html", {"form":form, "greetings":random.choice(greetings), "fams":fams})
+        return Response(
+            {"form":form, "greetings":random.choice(greetings), "fams":famSerializer.data},
+            template_name="pl/fam.html"
+        )
     else:
-        return redirect('login')
+        fams = FanOfIPL.objects.all()
+        famSerializer = FamSerializer(fams, many=True)
+        return Response(
+            {
+                'fams':famSerializer.data
+            }
+        )
 
 def delete_fan_data(request, fan_id):
     fan = FanOfIPL.objects.get(id=fan_id)
