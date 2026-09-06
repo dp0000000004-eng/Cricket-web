@@ -142,7 +142,7 @@ class Champs(models.Model):
     champs = models.CharField(max_length=64)
 
     def __str__(self):
-        return f"{self.year} {self.champs}"
+        return f"{self.year}"
     
 class Blog(models.Model):
     year = models.ForeignKey(Champs, on_delete=models.CASCADE, related_name="champ_year")

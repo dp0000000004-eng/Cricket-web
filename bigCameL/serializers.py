@@ -3,6 +3,7 @@ from rest_framework import serializers
 from .models import Official_code_of_playertype
 from .models import Venues, Players, Matches
 from .models import About_venue, Blog, Champs
+from .models import FanOfIPL
 
 
 
@@ -66,4 +67,22 @@ class BlogSerializer(serializers.ModelSerializer):
     year = serializers.StringRelatedField()
     class Meta:
         model = Blog
-        fields = ['id', 'year', 'blog']
+        fields = ['id', 'year', 'Blog']
+
+
+class MatchesSerializer(serializers.ModelSerializer):
+    team1 = serializers.StringRelatedField()
+    team2 = serializers.StringRelatedField()
+    venues = serializers.StringRelatedField()
+    home_of = serializers.StringRelatedField()
+    city = serializers.StringRelatedField()
+    class Meta:
+        model = Matches
+        fields = ['id', 'team1', 'team2', 'venues', 'home_of', 'date_time', 'city']
+
+
+class FamSerializer(serializers.ModelSerializer):
+    username = serializers.StringRelatedField()
+    class Meta:
+        model = FanOfIPL
+        fields = ['id', 'username', 'email', 'title' , 'fan_image', 'descriptions']
