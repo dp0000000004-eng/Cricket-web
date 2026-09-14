@@ -4,6 +4,7 @@ from . import views
 
 
 urlpatterns = [
+
     path("login/", views.login_view, name="login"),
     path("", views.home, name="home"),
     path("teams/", views.team_view, name="team_view"),
@@ -18,4 +19,6 @@ urlpatterns = [
     path("blog/<int:team_id>/", views.blog_view, name="full_blog"),
     path("fam/", views.fam_view, name="fam"),
     path("Delete/<int:fan_id>", views.delete_fan_data, name="delete_fam"),
+    path('sit-data/', views.totalSitAPIView, name="sit_data"),
+    
 ]

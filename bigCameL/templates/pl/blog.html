@@ -6,12 +6,14 @@
 {% endblock %}
     
 {% block body %}
+
 {% if blog %}
-    {% for b in blog %}
+    <h2>
+        {{ blog.year }}
+    </h2>
     <p>
-        {{ b }}
+        {{ blog.text }}
     </p>
-    {% endfor %}
     <br>
     <div class="btns">
         <a class="prev" href="{% url 'full_blog' team_id|add:-1 %}"><span>&laquo</span> Previous</a>

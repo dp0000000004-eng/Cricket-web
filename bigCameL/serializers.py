@@ -3,7 +3,7 @@ from rest_framework import serializers
 from .models import Official_code_of_playertype
 from .models import Venues, Players, Matches
 from .models import About_venue, Blog, Champs
-from .models import FanOfIPL
+from .models import FanOfIPL, TotalSit
 import bleach
 
 
@@ -135,10 +135,11 @@ class BlogSerializer(serializers.ModelSerializer):
         return sanitize_value(value)
     def validate_Blog(self, value):
         return sanitize_value(value)
+    text = serializers.CharField(source="blog")
     
     class Meta:
         model = Blog
-        fields = ['id', 'year', 'Blog']
+        fields = ['id', 'year', 'text']
 
 
 class MatchesSerializer(serializers.ModelSerializer):
@@ -181,3 +182,23 @@ class FamSerializer(serializers.ModelSerializer):
     class Meta:
         model = FanOfIPL
         fields = ['id', 'username', 'email', 'title', 'fan_image', 'descriptions']
+
+
+
+class TotalSitSerializer(serializers.ModelSerializer):
+    def validate_vip(self, value):
+        return sanitize_value(value)
+    def validate_normal(self, value):
+        return sanitize_value(value)
+    class Meta:
+        model = TotalSit
+        fields = ['id', 'sit_available', 'vip', 'normal']
+
+    extra_kwags = {
+        "vip":{
+            "min_value":0
+        },
+        "normal":{
+            "min_value":0
+        }
+    }

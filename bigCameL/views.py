@@ -9,7 +9,6 @@ import requests
 from rest_framework.renderers import TemplateHTMLRenderer, JSONRenderer
 from rest_framework.decorators import api_view, renderer_classes
 from dotenv import load_dotenv
-import os
 from .serializers import TeamsSerializer, VideoSerializers, MetaSerializer
 import random
 from rest_framework_xml.renderers import XMLRenderer
@@ -18,7 +17,8 @@ from .serializers import VenuesSerializer, PlayerSerializer, AboutVenueSerialize
 from rest_framework_yaml.renderers import YAMLRenderer
 from rest_framework_csv.renderers import CSVRenderer
 from .serializers import ChampsSerializer, BlogSerializer, MatchesSerializer
-from .serializers import FamSerializer
+from .serializers import FamSerializer, TotalSitSerializer
+from rest_framework.renderers import BrowsableAPIRenderer
 
 
 @api_view(['GET', 'POST'])
@@ -37,7 +37,7 @@ def team_view(request):
 @api_view(['POST', 'GET'])
 @renderer_classes([TemplateHTMLRenderer, JSONRenderer, XMLRenderer, YAMLRenderer, CSVRenderer])
 def player_view(request, team_id):
-    players = Players.objects.filter(team=team_id).select_related(          'team', 'code').all()
+    players = Players.objects.filter(team=team_id).select_related('team', 'code').all()
     playersSerializer = PlayerSerializer(players, many=True)
     return Response({'players':playersSerializer.data} ,template_name="pl/players.html")
 
@@ -76,8 +76,6 @@ def home(request):
     Weather = None
     Wind_speed = None
 
-
-    
     try:
         url = f"https://api.openweathermap.org/data/2.5/forecast?lat={lat}&lon={lon}&units=metric&appid={api_key}"
         response = requests.get(url)
@@ -116,10 +114,10 @@ def about_venue(request, venue_id):
     
     return Response(
         {
-            'about_venues':about_venueSerializer,
+            'about_venues':about_venueSerializer.data,
         }
         ,
-        template_name='pl/venues.html'
+        template_name='pl/about_venue.html'
     )
 
 
@@ -245,7 +243,7 @@ def blog_view(request, team_id):
     if team_id > last_count:
         return redirect('blog')
     if team_id <= last_count:
-        blog = Blog.objects.filter(year=team_id)
+        blog = Blog.objects.get(pk=team_id)
         blogSerializer = BlogSerializer(blog, many=False)
         if team_id == 0:
             return redirect('blog')
@@ -313,3 +311,20 @@ def delete_fan_data(request, fan_id):
 
     fan.delete()
     return redirect("fam")
+
+
+
+@api_view(['GET', 'POST'])
+@renderer_classes([JSONRenderer, BrowsableAPIRenderer])
+def totalSitAPIView(request):
+    items = TotalSit.objects.all()[0]
+
+    sitSerializer = TotalSitSerializer(items)
+
+    store_data = TotalSitSerializer(data=request.data)
+    store_data.is_valid(raise_exception=True)
+    store_data.save()
+
+    return Response(
+        {"items":sitSerializer.data}
+    )

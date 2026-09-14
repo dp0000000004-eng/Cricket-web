@@ -7,7 +7,7 @@
 {% block body %}
     <ul>
     {% for venue in venues %}
-        <a href="{% url 'about_venue' venue.id %}"><li>{{ venue }}</li></a>
+        <a href="{% url 'about_venue' venue.id %}"><li>{{ venue.venue_name }}</li></a>
     {% endfor %}
     </ul>
 {% endblock %}
