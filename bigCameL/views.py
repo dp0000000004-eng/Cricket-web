@@ -328,3 +328,6 @@ def totalSitAPIView(request):
     return Response(
         {"items":sitSerializer.data}
     )
+
+def try_gh():
+    return "this pr from terminal"
