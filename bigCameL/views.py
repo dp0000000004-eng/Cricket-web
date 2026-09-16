@@ -19,6 +19,7 @@ from rest_framework_csv.renderers import CSVRenderer
 from .serializers import ChampsSerializer, BlogSerializer, MatchesSerializer
 from .serializers import FamSerializer, TotalSitSerializer
 from rest_framework.renderers import BrowsableAPIRenderer
+from django.core.paginator import Paginator, EmptyPage
 
 
 @api_view(['GET', 'POST'])
@@ -93,7 +94,7 @@ def home(request):
     return Response(
 
         {
-            'data':data,
+            # 'data':data,
             "videos":videosSerializer.data, 
             "ipl":metaSerializer.data,
             "temp":Temp or None,
@@ -267,7 +268,6 @@ def fam_view(request):
     if request.user.is_authenticated:
 
         fams = FanOfIPL.objects.all()
-        famSerializer = FamSerializer(fams, many=True)
 
         greetings = [
             "Thanks for the love, have a nice day!",
@@ -293,17 +293,44 @@ def fam_view(request):
                 return redirect("fam")
         else:
             form = FamForm()
+
+        perpage = request.query_params.get('perpage', default=3)
+        page = request.query_params.get('page', default=1)
+
+
+        fams = FanOfIPL.objects.all()
+        paginator = Paginator( fams, per_page=perpage)
+
+        try:
+            fams = paginator.page(number=page)
+        except EmptyPage:
+            fams = []
+        
+        famSerializer = FamSerializer(fams, many=True)
         return Response(
             {"form":form, "greetings":random.choice(greetings), "fams":famSerializer.data},
             template_name="pl/fam.html"
         )
     else:
+
+        perpage = request.query_params.get('perpage', default=3)
+        page = request.query_params.get('page', default=1)
+
+
         fams = FanOfIPL.objects.all()
+        paginator = Paginator( fams, per_page=perpage)
+
+        try:
+            fams = paginator.page(number=page)
+        except EmptyPage:
+            fams = []
+        
         famSerializer = FamSerializer(fams, many=True)
         return Response(
             {
                 'fams':famSerializer.data
-            }
+            },
+            template_name="pl/fam.html"
         )
 
 def delete_fan_data(request, fan_id):
@@ -329,5 +356,3 @@ def totalSitAPIView(request):
         {"items":sitSerializer.data}
     )
 
-def try_gh():
-    return "this pr from terminal"
