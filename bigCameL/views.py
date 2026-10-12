@@ -18,6 +18,7 @@ from rest_framework_yaml.renderers import YAMLRenderer
 from rest_framework_csv.renderers import CSVRenderer
 from .serializers import ChampsSerializer, BlogSerializer, MatchesSerializer
 from .serializers import FamSerializer, TotalSitSerializer
+import os
 from rest_framework.renderers import BrowsableAPIRenderer
 from django.core.paginator import Paginator, EmptyPage
 
@@ -69,41 +70,44 @@ def home(request):
 
     load_dotenv()
 
-    api_key = "76ebe517808963e9bcbfd579a75c3568"
-
-    lat = 20.82995822420193
-    lon = 85.05696466179847
-    Temp = None
-    Weather = None
-    Wind_speed = None
-
     try:
+
+        api_key = os.getenv('openwether_api_key')
+
+        lat = 20.82995822420193
+        lon = 85.05696466179847
+        Temp = None
+        Weather = None
+        Wind_speed = None
+
+    
         url = f"https://api.openweathermap.org/data/2.5/forecast?lat={lat}&lon={lon}&units=metric&appid={api_key}"
         response = requests.get(url)
         data = response.json()
 
+        
+
+        ipl = IPLMeta.objects.all()
+        videos = Video.objects.all()
+        metaSerializer = MetaSerializer(ipl, many=True)
+        videosSerializer = VideoSerializers(videos, many=True)
+
+
+        return Response(
+
+            {
+                # 'data':data,
+                "videos":videosSerializer.data, 
+                "ipl":metaSerializer.data,
+                "temp":Temp or None,
+                "wethr_desc":Weather or None,
+                "wind":Wind_speed or None
+            },
+
+            template_name='pl/home.html'
+        )
     except requests.exceptions.ConnectionError :
-        pass
-
-    ipl = IPLMeta.objects.all()
-    videos = Video.objects.all()
-    metaSerializer = MetaSerializer(ipl, many=True)
-    videosSerializer = VideoSerializers(videos, many=True)
-
-
-    return Response(
-
-        {
-            # 'data':data,
-            "videos":videosSerializer.data, 
-            "ipl":metaSerializer.data,
-            "temp":Temp or None,
-            "wethr_desc":Weather or None,
-            "wind":Wind_speed or None
-        },
-
-        template_name='pl/home.html'
-    )
+        print('connection error')
 
 
 
