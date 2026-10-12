@@ -96,6 +96,7 @@ class PlayerSerializer(serializers.ModelSerializer):
         return sanitize_value(value)
     def validate_code(self, value):
         return sanitize_value(value)
+    
     class Meta:
         model = Players
         fields = ['id', 'player_name', 'jersey_no', 'is_overseas', 'is_captain', 'team', 'code']
