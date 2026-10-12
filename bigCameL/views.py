@@ -85,11 +85,16 @@ def home(request):
         response = requests.get(url)
         data = response.json()
 
+
+        Temp = data['list'][0]['main']['temp']
+        Weather = data['list'][0]['weather'][0]['description']
+        Wind_speed = data['list'][0]['wind']['speed']
+
         
 
         ipl = IPLMeta.objects.all()
         videos = Video.objects.all()
-        metaSerializer = MetaSerializer(ipl, many=True)
+        metaSerializer = MetaSerializer(ipl, many=False)
         videosSerializer = VideoSerializers(videos, many=True)
 
 
@@ -108,6 +113,31 @@ def home(request):
         )
     except requests.exceptions.ConnectionError :
         print('connection error')
+
+    except Exception as e:
+
+
+        ipl = IPLMeta.objects.all()
+        videos = Video.objects.all()
+        metaSerializer = MetaSerializer(ipl, many=True)
+        videosSerializer = VideoSerializers(videos, many=True)
+
+
+        return Response(
+
+            {
+                # 'data':data,
+                "videos":videosSerializer.data, 
+                "ipl":metaSerializer.data,
+                "temp":None,
+                "wethr_desc": None,
+                "wind":None,
+                "error":str(e)
+            },
+
+            template_name='pl/home.html'
+        )
+
 
 
 
