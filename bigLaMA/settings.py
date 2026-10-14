@@ -105,6 +105,24 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 
+
+
+REST_FRAMEWORK = {
+    "DEFAULT_AUTHENTICATION_CLASSES":(
+        # 'rest_framework_simplejwt.authentication.JWTAuthentication',
+        # 'rest_framework.authentication.TokenAuthentication',
+        "rest_framework.authentication.SessionAuthentication",
+    ),
+    "DEFAULT_THROTTLE_RATES":{
+        'anon':'2/minute',
+        'user':'10/minute',
+    }
+}
+
+
+
+
+
 # Internationalization
 # https://docs.djangoproject.com/en/6.0/topics/i18n/
 
