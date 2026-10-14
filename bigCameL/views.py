@@ -20,6 +20,8 @@ from .serializers import ChampsSerializer, BlogSerializer, MatchesSerializer
 from .serializers import FamSerializer, TotalSitSerializer
 import os
 from rest_framework.renderers import BrowsableAPIRenderer
+from rest_framework.decorators import throttle_classes
+from rest_framework.throttling import UserRateThrottle, AnonRateThrottle
 from django.core.paginator import Paginator, EmptyPage
 
 
@@ -66,6 +68,7 @@ def login_view(request):
 
 @api_view(['POST', 'GET'])
 @renderer_classes([TemplateHTMLRenderer, JSONRenderer, XMLRenderer])
+@throttle_classes([AnonRateThrottle])
 def home(request):
 
     load_dotenv()
