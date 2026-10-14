@@ -146,15 +146,16 @@ class BlogSerializer(serializers.ModelSerializer):
 class MatchesSerializer(serializers.ModelSerializer):
     team1 = serializers.StringRelatedField()
     team2 = serializers.StringRelatedField()
-    venues = serializers.StringRelatedField()
+    venue = serializers.StringRelatedField()
     home_of = serializers.StringRelatedField()
     city = serializers.StringRelatedField()
+    date_time = serializers.StringRelatedField()
 
     def validate_team1(self, value):
         return sanitize_value(value)
     def validate_team2(self, value):
         return sanitize_value(value)
-    def validate_venues(self, value):
+    def validate_venue(self, value):
         return sanitize_value(value)
     def validate_home_of(self, value):
         return sanitize_value(value)
@@ -164,7 +165,7 @@ class MatchesSerializer(serializers.ModelSerializer):
         return sanitize_value(value)
     class Meta:
         model = Matches
-        fields = ['id', 'team1', 'team2', 'venues', 'home_of', 'date_time', 'city']
+        fields = ['id', 'team1', 'team2', 'venue', 'home_of', 'date_time', 'city']
 
 
 class FamSerializer(serializers.ModelSerializer):

@@ -111,8 +111,6 @@ def home(request):
 
             template_name='pl/home.html'
         )
-    except requests.exceptions.ConnectionError :
-        print('connection error')
 
     except Exception as e:
 
@@ -121,6 +119,9 @@ def home(request):
         videos = Video.objects.all()
         metaSerializer = MetaSerializer(ipl, many=True)
         videosSerializer = VideoSerializers(videos, many=True)
+
+        for i in ipl: print(i.total_team)
+    
 
 
         return Response(
