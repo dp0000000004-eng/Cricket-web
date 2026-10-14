@@ -19,9 +19,12 @@ from rest_framework_csv.renderers import CSVRenderer
 from .serializers import ChampsSerializer, BlogSerializer, MatchesSerializer
 from .serializers import FamSerializer, TotalSitSerializer
 import os
+import requests
+from django.http import JsonResponse
 from rest_framework.renderers import BrowsableAPIRenderer
-from rest_framework.decorators import throttle_classes
+from rest_framework.decorators import throttle_classes, permission_classes
 from rest_framework.throttling import UserRateThrottle, AnonRateThrottle
+from rest_framework.permissions import IsAuthenticated
 from django.core.paginator import Paginator, EmptyPage
 
 
@@ -68,7 +71,8 @@ def login_view(request):
 
 @api_view(['POST', 'GET'])
 @renderer_classes([TemplateHTMLRenderer, JSONRenderer, XMLRenderer])
-@throttle_classes([AnonRateThrottle])
+@throttle_classes([UserRateThrottle])
+@permission_classes([IsAuthenticated])
 def home(request):
 
     load_dotenv()
@@ -123,7 +127,6 @@ def home(request):
         metaSerializer = MetaSerializer(ipl, many=True)
         videosSerializer = VideoSerializers(videos, many=True)
 
-        for i in ipl: print(i.total_team)
     
 
 
@@ -394,3 +397,28 @@ def totalSitAPIView(request):
         {"items":sitSerializer.data}
     )
 
+
+def getJWTToken(request):
+
+
+    if request.method == "POST":
+        username = request.POST.get('username')
+        password = request.POST.get('password')
+
+
+        try:
+            res = requests.post(
+                "http://127.0.0.1:8000/token/",
+                json={"username": username, "password": password},  # sent as JSON body
+                timeout=5,
+            )
+            res.raise_for_status()
+            data = res.json()
+
+            return render(request, 'pl/jwtToken.html', {'data':data})
+
+
+        except requests.RequestException as e:
+                return JsonResponse({"error": str(e)}, status=502)
+
+    return render(request, 'pl/jwtToken.html')

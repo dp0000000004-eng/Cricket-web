@@ -1,7 +1,7 @@
 
 from django.urls import path
 from . import views
-
+from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
 urlpatterns = [
 
@@ -20,5 +20,7 @@ urlpatterns = [
     path("fam/", views.fam_view, name="fam"),
     path("Delete/<int:fan_id>", views.delete_fan_data, name="delete_fam"),
     path('sit-data/', views.totalSitAPIView, name="sit_data"),
+    path('token/html/', views.getJWTToken, name="jwt_html"),
+    path('token/', TokenObtainPairView.as_view(), name="token_obtainpair"),
     
 ]
