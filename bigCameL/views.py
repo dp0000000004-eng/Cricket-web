@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect
-from .models import Teams, Players, Matches, Venues, About_venue, TotalSit, Video, Champs, Blog, SitPrice, FanOfIPL, IPLMeta
+from .models import Teams, Players, Matches, Venues, About_venue, TotalSit, Video
+from .models import Champs, Blog, SitPrice, FanOfIPL, IPLMeta
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
 from .forms import BookingForm, UserForm, FamForm
@@ -26,6 +27,7 @@ from rest_framework.decorators import throttle_classes, permission_classes
 from rest_framework.throttling import UserRateThrottle, AnonRateThrottle
 from rest_framework.permissions import IsAuthenticated
 from django.core.paginator import Paginator, EmptyPage
+from .throttles import MatchesThrottle
 
 
 @api_view(['GET', 'POST'])
@@ -70,10 +72,11 @@ def login_view(request):
 
 
 @api_view(['POST', 'GET'])
-@renderer_classes([TemplateHTMLRenderer, JSONRenderer, XMLRenderer])
+@renderer_classes([TemplateHTMLRenderer, JSONRenderer, XMLRenderer, YAMLRenderer])
 @throttle_classes([UserRateThrottle])
 @permission_classes([IsAuthenticated])
 def home(request):
+    
 
     load_dotenv()
 
@@ -81,8 +84,8 @@ def home(request):
 
         api_key = os.getenv('openwether_api_key')
 
-        lat = 20.82995822420193
-        lon = 85.05696466179847
+        lat = float(os.getenv('lat'))
+        lon = float(os.getenv('lon'))
         Temp = None
         Weather = None
         Wind_speed = None
@@ -163,12 +166,18 @@ def about_venue(request, venue_id):
     )
 
 
+
+
 @api_view(['POST', 'GET'])
 @renderer_classes([TemplateHTMLRenderer, JSONRenderer, XMLRenderer, CSVRenderer])
+@permission_classes([IsAuthenticated])
+@throttle_classes([MatchesThrottle])
 def matches_view(request):
     matches = Matches.objects.all()
     matchesSerializer = MatchesSerializer(matches, many=True)
     return Response({"matches":matchesSerializer.data}, template_name="pl/matches.html")
+
+
 
 
 @api_view(['POST', 'GET'])
