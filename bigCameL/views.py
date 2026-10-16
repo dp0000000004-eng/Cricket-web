@@ -21,6 +21,7 @@ from .serializers import ChampsSerializer, BlogSerializer, MatchesSerializer
 from .serializers import FamSerializer, TotalSitSerializer
 import os
 import requests
+from requests import RequestException
 from django.http import JsonResponse
 from rest_framework.renderers import BrowsableAPIRenderer
 from rest_framework.decorators import throttle_classes, permission_classes
@@ -142,7 +143,7 @@ def home(request):
                 "temp":None,
                 "wethr_desc": None,
                 "wind":None,
-                "error":str(e)
+                "error":str(type(e).__name__)
             },
 
             template_name='pl/home.html'
@@ -210,7 +211,7 @@ def booking(request):
             "welcome ",
             "Have a Good day ",
             "Hello, ",
-            "nice coffe, "
+            "nice coffee, "
         ]
         
 
@@ -262,8 +263,11 @@ def createAccount(request):
         user = User(username=username, email=email)
         user.set_password(raw_password)
         user.save()
+        username = ""
+        email = "" 
+        raw_password = ""
         messages.success(request, message="Account Created")
-    return render(request, "pl/create_a_c.html", {"form":UserForm(request.POST)})
+    return render(request, "pl/create_a_c.html")
 
 def logout_view(request):
     logout(request)
@@ -427,7 +431,33 @@ def getJWTToken(request):
             return render(request, 'pl/jwtToken.html', {'data':data})
 
 
-        except requests.RequestException as e:
-                return JsonResponse({"error": str(e)}, status=502)
+        except RequestException as e:
+            return JsonResponse({"error": str(e)}, status=502)
 
     return render(request, 'pl/jwtToken.html')
+
+
+def refreshJWTToken(request):
+
+    if request.method == "POST":
+        refresh_token = request.POST.get('refresh')
+
+        try:
+
+            res = requests.post(
+                "http://127.0.0.1:8000/token/refresh/",
+                json={"refresh": refresh_token},  # sent as JSON body
+                timeout=5,
+            )
+            res.raise_for_status()
+            data = res.json()
+
+            return render(request, 'pl/jwtRefresh.html', {'data':data})
+
+        except RequestException as e:
+            return JsonResponse({"error":str(type(e).__name__)}, status=502)
+
+
+    return render(request, 'pl/jwtRefresh.html')
+    
+    
