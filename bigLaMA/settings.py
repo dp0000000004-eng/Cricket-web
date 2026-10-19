@@ -35,6 +35,7 @@ ALLOWED_HOSTS = []
 
 INSTALLED_APPS = [
     'rest_framework',
+    'rest_framework_api_key',
     'bigCameL',
     'embed_video',
     'django.contrib.admin',
@@ -44,6 +45,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework_simplejwt',
+    
 ]
 
 MIDDLEWARE = [
@@ -110,10 +112,18 @@ AUTH_PASSWORD_VALIDATORS = [
 
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES":(
+
         'rest_framework_simplejwt.authentication.JWTAuthentication',
         'rest_framework.authentication.TokenAuthentication',
         "rest_framework.authentication.SessionAuthentication",
+        # 'rest_framework_api_key.authentication.APIKeyAuthentication', 
+
     ),
+    "DEFAULT_PERMISSION_CLASSES":(
+        "rest_framework_api_key.permissions.HasAPIKey",
+
+    ),
+
     "DEFAULT_THROTTLE_RATES":{
         'anon':'2/minute',
         'user':'10/minute',

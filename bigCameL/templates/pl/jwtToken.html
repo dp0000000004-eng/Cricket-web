@@ -245,5 +245,46 @@
                 {% endif %}
             </section>
         </main>
+        <script>
+            document.querySelectorAll('.token').forEach((token) => {
+                const heading = token.querySelector('h2');
+                const code = token.querySelector('code');
+                if (!heading || !code) return;
+
+                const header = document.createElement('div');
+                header.className = 'token-header';
+                const button = document.createElement('button');
+                button.className = 'copy-btn';
+                button.type = 'button';
+                button.textContent = 'Copy';
+                button.setAttribute('aria-label', `Copy ${heading.textContent.trim().toLowerCase()}`);
+
+                token.insertBefore(header, heading);
+                header.append(heading, button);
+
+                button.addEventListener('click', async () => {
+                    const text = code.textContent.trim();
+                    try {
+                        if (navigator.clipboard && window.isSecureContext) {
+                            await navigator.clipboard.writeText(text);
+                        } else {
+                            const temporary = document.createElement('textarea');
+                            temporary.value = text;
+                            temporary.style.position = 'fixed';
+                            temporary.style.opacity = '0';
+                            document.body.appendChild(temporary);
+                            temporary.select();
+                            const copied = document.execCommand('copy');
+                            temporary.remove();
+                            if (!copied) throw new Error('Copy failed');
+                        }
+                        button.textContent = 'Copied!';
+                    } catch {
+                        button.textContent = 'Copy failed';
+                    }
+                    setTimeout(() => { button.textContent = 'Copy'; }, 1500);
+                });
+            });
+        </script>
     </body>
 </html>

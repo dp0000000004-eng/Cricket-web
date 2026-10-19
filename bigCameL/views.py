@@ -29,6 +29,8 @@ from rest_framework.throttling import UserRateThrottle, AnonRateThrottle
 from rest_framework.permissions import IsAuthenticated
 from django.core.paginator import Paginator, EmptyPage
 from .throttles import MatchesThrottle
+from rest_framework_api_key.models import APIKey
+from rest_framework_api_key.permissions import HasAPIKey
 
 
 @api_view(['GET', 'POST'])
@@ -75,7 +77,7 @@ def login_view(request):
 @api_view(['POST', 'GET'])
 @renderer_classes([TemplateHTMLRenderer, JSONRenderer, XMLRenderer, YAMLRenderer])
 @throttle_classes([UserRateThrottle])
-@permission_classes([IsAuthenticated])
+@permission_classes([HasAPIKey, IsAuthenticated])
 def home(request):
     
 
@@ -155,7 +157,7 @@ def home(request):
 @api_view(['POST', 'GET'])
 @renderer_classes([TemplateHTMLRenderer, JSONRenderer, XMLRenderer, CSVRenderer])
 def about_venue(request, venue_id):
-    about_venues = About_venue.objects.filter(id=venue_id)
+    about_venues = About_venue.objects.filter(id=venue_id).select_related('stadium_name')
     about_venueSerializer = AboutVenueSerializer(about_venues, many=True)
     
     return Response(
@@ -169,19 +171,21 @@ def about_venue(request, venue_id):
 
 
 
-@api_view(['POST', 'GET'])
+@api_view(['GET'])
 @renderer_classes([TemplateHTMLRenderer, JSONRenderer, XMLRenderer, CSVRenderer])
 @permission_classes([IsAuthenticated])
 @throttle_classes([MatchesThrottle])
 def matches_view(request):
-    matches = Matches.objects.all()
+    matches = Matches.objects.all().select_related('team1', 'team2' , 'venue', 'home_of', 'city')
     matchesSerializer = MatchesSerializer(matches, many=True)
     return Response({"matches":matchesSerializer.data}, template_name="pl/matches.html")
 
 
 
 
-@api_view(['POST', 'GET'])
+
+
+@api_view([ 'GET'])
 @renderer_classes([TemplateHTMLRenderer, JSONRenderer, XMLRenderer])
 def venue_view(request):
     venues = Venues.objects.all()
@@ -275,7 +279,7 @@ def logout_view(request):
 
 
 
-@api_view(['POST', 'GET'])
+@api_view(['GET'])
 @renderer_classes([TemplateHTMLRenderer, JSONRenderer, XMLRenderer, YAMLRenderer, CSVRenderer])
 def champs(request):
     champs = Champs.objects.all()
@@ -283,7 +287,7 @@ def champs(request):
     return Response({"champs":champsSerializer.data}, template_name="pl/champs.html")
 
 
-@api_view(['POST', 'GET'])
+@api_view([ 'GET'])
 @renderer_classes([TemplateHTMLRenderer, JSONRenderer, XMLRenderer, YAMLRenderer, CSVRenderer])
 def blog_view(request, team_id):
     champs_ = Champs.objects.all().count()
@@ -315,7 +319,7 @@ def blog_view(request, team_id):
 
 
 
-@api_view(['POST', 'GET'])
+@api_view([ 'GET'])
 @renderer_classes([TemplateHTMLRenderer, JSONRenderer, XMLRenderer, YAMLRenderer, CSVRenderer])
 def fam_view(request):
 
@@ -460,4 +464,33 @@ def refreshJWTToken(request):
 
     return render(request, 'pl/jwtRefresh.html')
     
-    
+
+
+@permission_classes([HasAPIKey])
+
+def generateAPIkey(request):
+
+    if request.method == "POST":
+
+        username = request.POST.get('username')
+        password = request.POST.get('password')
+
+        user = User(
+            username=username,
+            password=password
+        )
+
+        if user is not None:
+
+            api_key, key = APIKey.objects.create_key(name="my-remote-service")
+
+
+            return render(request, 'pl/APIKey.html', {"key":key, "prefix":api_key.prefix})
+
+        else:
+            return render(request, 'pl/APIKey.html', {"error":"Invalid Credetials !"})
+
+
+    return render(request, 'pl/APIKey.html')
+
+
