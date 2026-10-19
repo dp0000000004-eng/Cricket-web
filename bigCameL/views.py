@@ -436,7 +436,7 @@ def getJWTToken(request):
 
 
         except RequestException as e:
-            return JsonResponse({"error": str(e)}, status=502)
+            return render(request, 'pl/jwtToken.html', {"error": str(type(e).__name__)})
 
     return render(request, 'pl/jwtToken.html')
 
@@ -475,7 +475,8 @@ def generateAPIkey(request):
         username = request.POST.get('username')
         password = request.POST.get('password')
 
-        user = User(
+        user = authenticate(
+            request,
             username=username,
             password=password
         )
@@ -488,7 +489,7 @@ def generateAPIkey(request):
             return render(request, 'pl/APIKey.html', {"key":key, "prefix":api_key.prefix})
 
         else:
-            return render(request, 'pl/APIKey.html', {"error":"Invalid Credetials !"})
+            return render(request, 'pl/APIKey.html', {"error":"Invalid Credentials !"})
 
 
     return render(request, 'pl/APIKey.html')

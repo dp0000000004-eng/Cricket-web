@@ -65,6 +65,34 @@
                 line-height: 1.6;
             }
 
+            .error-message {
+                display: flex;
+                align-items: flex-start;
+                gap: 10px;
+                margin: 22px 0 0;
+                padding: 13px 15px;
+                border: 1px solid #f2d4d4;
+                border-radius: 12px;
+                background: #fff7f7;
+                color: #a53f45;
+                font-size: .9rem;
+                line-height: 1.5;
+            }
+
+            .error-message::before {
+                content: "!";
+                display: grid;
+                flex: 0 0 19px;
+                width: 19px;
+                height: 19px;
+                place-items: center;
+                border-radius: 50%;
+                background: #f9e4e4;
+                color: #a53f45;
+                font-size: .75rem;
+                font-weight: 800;
+            }
+
             form { display: grid; gap: 9px; }
 
             label {
@@ -242,6 +270,11 @@
                             <br>The Refresh token is used for generate another Access token</p>
 
                     </section>
+                {% endif %}
+                {% if error %}
+                <p class="error-message" role="alert">
+                    {{ error }}
+                </p>
                 {% endif %}
             </section>
         </main>
