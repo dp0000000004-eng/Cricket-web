@@ -23,6 +23,7 @@ urlpatterns = [
     path('token/html/', views.getJWTToken, name="jwt_html"),
     path('token/', TokenObtainPairView.as_view(), name="token_obtainpair"),
     path('token/refresh/', TokenRefreshView.as_view() , name="token_pair_refresh"),
-    path('token/refresh/html/', views.refreshJWTToken, name="refresh_tokne_html")
+    path('token/refresh/html/', views.refreshJWTToken, name="refresh_tokne_html"),
+    path('api/', views.generateAPIkey, name="get_api"),
     
 ]

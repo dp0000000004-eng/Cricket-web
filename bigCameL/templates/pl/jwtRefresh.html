@@ -228,7 +228,10 @@
                 {% if data %}
                     <section class="tokens" aria-label="Generated tokens">
                         <div class="token">
-                            <h2>Access token</h2>
+                            <div class="token-header">
+                                <h2>Access token</h2>
+                                <button class="copy-btn" type="button" id="copy-access-token">Copy</button>
+                            </div>
                             <code>{{ data.access }}</code>
                         </div>
                         
@@ -238,5 +241,29 @@
                 {% endif %}
             </section>
         </main>
+        <script>
+            const copyAccessTokenButton = document.getElementById('copy-access-token');
+
+            if (copyAccessTokenButton) {
+                copyAccessTokenButton.addEventListener('click', async () => {
+                    const accessToken = copyAccessTokenButton
+                        .closest('.token')
+                        .querySelector('code')
+                        .textContent
+                        .trim();
+
+                    try {
+                        await navigator.clipboard.writeText(accessToken);
+                        copyAccessTokenButton.textContent = 'Copied!';
+                    } catch (error) {
+                        copyAccessTokenButton.textContent = 'Copy failed';
+                    }
+
+                    window.setTimeout(() => {
+                        copyAccessTokenButton.textContent = 'Copy';
+                    }, 1800);
+                });
+            }
+        </script>
     </body>
 </html>

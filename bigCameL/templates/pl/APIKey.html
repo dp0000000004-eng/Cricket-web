@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="theme-color" content="#1a73e8">
+        <title>Get your tokens</title>
+        <style>
+            :root {
+                font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+                color: #172b4d;
+                background: #f4f8ff;
+                font-synthesis: none;
+                text-rendering: optimizeLegibility;
+                -webkit-font-smoothing: antialiased;
+            }
+
+            * { box-sizing: border-box; }
+
+            body {
+                min-height: 100vh;
+                margin: 0;
+                padding: 40px 20px;
+                display: grid;
+                place-items: center;
+                background:
+                    radial-gradient(ellipse at 15% 10%, rgba(26, 115, 232, .18), transparent 38%),
+                    radial-gradient(ellipse at 90% 90%, rgba(26, 115, 232, .12), transparent 34%),
+                    #f4f8ff;
+            }
+
+            .page { width: min(100%, 520px); }
+
+            .card {
+                padding: clamp(26px, 6vw, 42px);
+                border: 1px solid rgba(255, 255, 255, .9);
+                border-radius: 24px;
+                background: rgba(255, 255, 255, 0.8);
+                box-shadow: 0 24px 70px rgba(35, 83, 145, .13), 0 2px 8px rgba(35, 83, 145, .05);
+                backdrop-filter: blur(18px);
+                -webkit-backdrop-filter: blur(18px);
+            }
+
+            .eyebrow {
+                margin: 0 0 10px;
+                color: #1a73e8;
+                font-size: .75rem;
+                font-weight: 750;
+                letter-spacing: .13em;
+                text-transform: uppercase;
+            }
+
+            h1 {
+                margin: 0;
+                color: #14243b;
+                font-size: clamp(1.8rem, 6vw, 2.25rem);
+                letter-spacing: -.045em;
+                line-height: 1.15;
+            }
+
+            .intro {
+                margin: 12px 0 28px;
+                color: #64748b;
+                font-size: .96rem;
+                line-height: 1.6;
+            }
+
+            form { display: grid; gap: 9px; }
+
+            label {
+                margin-top: 9px;
+                color: #34445b;
+                font-size: .88rem;
+                font-weight: 650;
+            }
+
+            input[type="text"], input[type="password"] {
+                width: 100%;
+                min-height: 48px;
+                padding: 0 14px;
+                border: 1px solid #d7e1ef;
+                border-radius: 12px;
+                outline: none;
+                background: rgba(255, 255, 255, .88);
+                color: #172b4d;
+                font: inherit;
+                transition: border-color .18s ease, box-shadow .18s ease;
+            }
+
+            input::placeholder { color: #9aa8ba; }
+
+            input[type="text"]:focus, input[type="password"]:focus {
+                border-color: #1a73e8;
+                box-shadow: 0 0 0 4px rgba(26, 115, 232, .13);
+            }
+
+            input[type="submit"] {
+                min-height: 50px;
+                margin-top: 14px;
+                border: 0;
+                border-radius: 12px;
+                background: #1a73e8;
+                box-shadow: 0 8px 18px rgba(26, 115, 232, .22);
+                color: #fff;
+                cursor: pointer;
+                font: inherit;
+                font-weight: 700;
+                transition: background .18s ease, transform .18s ease, box-shadow .18s ease;
+            }
+
+            input[type="submit"]:hover {
+                transform: translateY(-1px);
+                background: #1765cc;
+                box-shadow: 0 11px 22px rgba(26, 115, 232, .27);
+            }
+
+            input[type="submit"]:focus-visible {
+                outline: 3px solid rgba(26, 115, 232, .35);
+                outline-offset: 3px;
+            }
+
+            .tokens {
+                display: grid;
+                gap: 14px;
+                margin-top: 28px;
+                padding-top: 24px;
+                border-top: 1px solid #e2eaf5;
+            }
+
+            .token {
+                min-width: 0;
+                padding: 15px;
+                border: 1px solid #e0eaf7;
+                border-radius: 13px;
+                background: rgba(255, 255, 255, .72);
+            }
+
+            .token-header {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                gap: 12px;
+                margin-bottom: 8px;
+            }
+
+            .token h2 {
+                margin: 0;
+                color: #1a73e8;
+                font-size: .78rem;
+                font-weight: 750;
+                letter-spacing: .08em;
+                text-transform: uppercase;
+            }
+
+            .copy-btn {
+                border: 1px solid #d7e1ef;
+                border-radius: 999px;
+                background: #eef5ff;
+                color: #1a73e8;
+                cursor: pointer;
+                font: inherit;
+                font-size: .73rem;
+                font-weight: 700;
+                padding: 7px 10px;
+                transition: background .18s ease, border-color .18s ease, transform .18s ease;
+            }
+
+            .copy-btn:hover {
+                background: #e2eeff;
+                border-color: #bfd5ff;
+                transform: translateY(-1px);
+            }
+
+            .copy-btn:focus-visible {
+                outline: 3px solid rgba(26, 115, 232, .25);
+                outline-offset: 2px;
+            }
+
+            .token code {
+                display: block;
+                overflow-wrap: anywhere;
+                word-break: break-word;
+                color: #3c4d63;
+                font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+                font-size: .82rem;
+                line-height: 1.6;
+            }
+
+            .error-message {
+                margin: 22px 0 0;
+                padding: 13px 16px;
+                border: 1px solid #f2caca;
+                border-left: 3px solid #d94b4b;
+                border-radius: 10px;
+                background: #fff7f7;
+                color: #9f3434;
+                font-size: .9rem;
+                font-weight: 600;
+                line-height: 1.5;
+            }
+
+            @media (max-width: 480px) {
+                body {
+                    padding: 24px 14px;
+                    place-items: start center;
+                }
+
+                .card {
+                    padding: clamp(20px, 6vw, 30px);
+                    border-radius: 18px;
+                }
+
+                .intro { margin-bottom: 22px; }
+                .token { padding: 13px; }
+            }
+
+            @media (min-width: 768px) {
+                body { padding: 56px 32px; }
+                .card { padding: 44px; }
+            }
+
+            @media (prefers-reduced-motion: reduce) {
+                *, *::before, *::after { transition-duration: .01ms !important; }
+            }
+        </style>
+    </head>
+    <body>
+        <main class="page">
+            <section class="card" aria-labelledby="page-title">
+                <p class="eyebrow">Matchday account</p>
+                <h1 id="page-title">Get your tokens</h1>
+                <p class="intro">Sign in with your account details to generate your authentication tokens.</p>
+
+                <form method="POST">
+                    {% csrf_token %}
+                    <label for="username">Username</label>
+                    <input id="username" type="text" name="username" placeholder="Enter your username" autocomplete="username" required>
+                    <label for="password">Password</label>
+                    <input id="password" type="password" name="password" placeholder="Enter your password" autocomplete="current-password" required>
+                    <input type="submit" value="Generate tokens">
+                </form>
+
+                {% if key %}
+                    <section class="tokens" aria-label="Generated tokens">
+                        <div class="token">
+                            <h2>API Key</h2>
+                            <code>{{ key }}</code>
+
+                        </div>
+                        <div class="token">
+                            <h2>Prefix</h2>
+                            <code>{{ prefix }}</code>
+
+                        </div>
+                        
+                        <p class="intro">Use access token for authentication porpose
+                            <br>The Refresh token is used for generate another Access token</p>
+
+                    </section>
+                {% endif %}
+
+                {% if error %}
+                <h3 class="error-message" role="alert">
+                    {{ error }}
+                </h3>
+                {% endif %}
+            </section>
+        </main>
+    </body>
+</html>

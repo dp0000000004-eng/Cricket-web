@@ -53,7 +53,7 @@ class Matches(models.Model):
     team1 = models.ForeignKey(Teams, on_delete=models.CASCADE, related_name="match_team_1")
     team2 = models.ForeignKey(Teams, on_delete=models.CASCADE, related_name="match_team_2")
     venue = models.ForeignKey(Venues, on_delete=models.CASCADE, related_name="match_venue")
-    home_of = models.ForeignKey(Teams, on_delete=models.CASCADE, related_name="home_tema_match")
+    home_of = models.ForeignKey(Teams, on_delete=models.CASCADE, related_name="home_team_match")
     date_time = models.DateTimeField(blank=True ,null=True)
     city = models.ForeignKey(City, on_delete=models.CASCADE, related_name="match_city")
 
