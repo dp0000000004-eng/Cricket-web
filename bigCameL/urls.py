@@ -25,5 +25,6 @@ urlpatterns = [
     path('token/refresh/', TokenRefreshView.as_view() , name="token_pair_refresh"),
     path('token/refresh/html/', views.refreshJWTToken, name="refresh_tokne_html"),
     path('api/', views.generateAPIkey, name="get_api"),
+    path('email-verify/', views.email_validator, name="otp"),
     
 ]
