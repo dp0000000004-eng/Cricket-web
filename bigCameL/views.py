@@ -21,6 +21,7 @@ from .serializers import ChampsSerializer, BlogSerializer, MatchesSerializer
 from .serializers import FamSerializer, TotalSitSerializer
 import os
 import requests
+from django.http import HttpResponse
 from requests import RequestException
 from django.http import JsonResponse
 from rest_framework.renderers import BrowsableAPIRenderer
@@ -31,6 +32,8 @@ from django.core.paginator import Paginator, EmptyPage
 from .throttles import MatchesThrottle
 from rest_framework_api_key.models import APIKey
 from rest_framework_api_key.permissions import HasAPIKey
+import logging
+from django.template.loader import render_to_string
 
 
 @api_view(['GET', 'POST'])
@@ -74,10 +77,10 @@ def login_view(request):
     return render(request, "pl/login.html")
 
 
-@api_view(['POST', 'GET'])
+@api_view(['GET'])
 @renderer_classes([TemplateHTMLRenderer, JSONRenderer, XMLRenderer, YAMLRenderer])
-@throttle_classes([UserRateThrottle])
-@permission_classes([HasAPIKey, IsAuthenticated])
+@throttle_classes([AnonRateThrottle])
+@permission_classes([IsAuthenticated])
 def home(request):
     
 
@@ -156,6 +159,7 @@ def home(request):
 
 @api_view(['POST', 'GET'])
 @renderer_classes([TemplateHTMLRenderer, JSONRenderer, XMLRenderer, CSVRenderer])
+@permission_classes([IsAuthenticated])
 def about_venue(request, venue_id):
     about_venues = About_venue.objects.filter(id=venue_id).select_related('stadium_name')
     about_venueSerializer = AboutVenueSerializer(about_venues, many=True)
@@ -264,14 +268,96 @@ def createAccount(request):
         username = request.POST.get("username")
         email = request.POST.get("email")
         raw_password = request.POST.get("password")
-        user = User(username=username, email=email)
-        user.set_password(raw_password)
-        user.save()
-        username = ""
-        email = "" 
-        raw_password = ""
-        messages.success(request, message="Account Created")
+
+        request.session['otp_data'] = {
+            'username':username,
+            'password':raw_password,
+            'email':email
+        }
+
+        return redirect('otp')
+
+
     return render(request, "pl/create_a_c.html")
+
+logger = logging.getLogger(__name__)
+
+def email_validator(request, expiry_minutes=10, otp=random.randint(int(os.getenv('otp_min_range')), int(os.getenv('otp_max_range')))):
+
+    load_dotenv()
+    email_sent = False
+
+    data = request.session.get('otp_data')
+
+    if not data:
+        return redirect('createAccount')
+
+    username = data['username']
+    password = data['password']
+    email = data['email']
+
+    
+
+
+    
+
+    app_name = "CrickWat"
+    logger.error(otp)
+
+    
+    
+
+    html = render_to_string("email.html", {
+        "otp": otp,
+        "user_name": username,
+        "app_name": app_name,
+        "expiry_minutes": expiry_minutes,
+    })
+    text = f"Hi {username}, your {app_name} verification code is {otp}. It expires in {expiry_minutes} minutes."
+
+    try:
+        response = requests.post(
+            "https://api.brevo.com/v3/smtp/email",
+            headers={
+                "api-key": os.getenv('brevo_api_key'),
+                "Content-Type": "application/json",
+            },
+            json={
+                "sender": {"name": "PawBytes Team", "email": os.getenv('brevo_user')},
+                "to": [{"email": email, "name": username}],
+                "subject": f"{otp} is your {app_name} verification code",
+                "htmlContent": html,
+                "textContent": text,
+            },
+            timeout=5,
+        )
+
+
+        response.raise_for_status()
+
+        if request.method == "POST":
+            logger.error(otp)
+
+            user_otp = request.POST.get('otp')
+            if int(user_otp) == otp:
+                user = User(
+                    username=username,
+                    email=email
+                )
+                user.set_password(password)
+                user.save()
+                del request.session['otp_data']
+                return HttpResponse('Authetication Done')
+            else:
+                return HttpResponse('not')
+
+
+        return render(request, "pl/email_otp.html", {"email_sent":email_sent})
+    except Exception as e:
+        logger.error(f"Failed to send OTP email: {type(e).__name__}: {e}")
+        return render(request, "pl/email_otp.html")
+
+
 
 def logout_view(request):
     logout(request)

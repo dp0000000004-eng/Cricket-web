@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verify Yout Email</title>
+</head>
+<body>
+    <form method="POST">
+        {% csrf_token %}
+        <label>Enter Your OTP</label>
+        <input type="password" name="otp" placeholder="******">
+        <input type="submit">
+        {% if email_sent %}
+            <p>
+                Email sent
+            </p>
+        {% endif %}
+    </form>
+</body>
+</html>
