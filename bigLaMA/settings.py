@@ -119,10 +119,10 @@ REST_FRAMEWORK = {
         # 'rest_framework_api_key.authentication.APIKeyAuthentication', 
 
     ),
-    "DEFAULT_PERMISSION_CLASSES":(
-        "rest_framework_api_key.permissions.HasAPIKey",
+    # "DEFAULT_PERMISSION_CLASSES":(
+    #     "rest_framework_api_key.permissions.HasAPIKey",
 
-    ),
+    # ),
 
     "DEFAULT_THROTTLE_RATES":{
         'anon':'2/minute',

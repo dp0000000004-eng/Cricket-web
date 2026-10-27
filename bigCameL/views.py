@@ -1,3 +1,9 @@
+import os
+import requests
+import random
+import requests
+import logging
+from django.views import View
 from django.shortcuts import render, redirect
 from .models import Teams, Players, Matches, Venues, About_venue, TotalSit, Video
 from .models import Champs, Blog, SitPrice, FanOfIPL, IPLMeta
@@ -6,12 +12,10 @@ from django.contrib import messages
 from .forms import BookingForm, UserForm, FamForm
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
-import requests
 from rest_framework.renderers import TemplateHTMLRenderer, JSONRenderer
 from rest_framework.decorators import api_view, renderer_classes
 from dotenv import load_dotenv
 from .serializers import TeamsSerializer, VideoSerializers, MetaSerializer
-import random
 from rest_framework_xml.renderers import XMLRenderer
 from rest_framework.response import Response
 from .serializers import VenuesSerializer, PlayerSerializer, AboutVenueSerializer
@@ -19,11 +23,10 @@ from rest_framework_yaml.renderers import YAMLRenderer
 from rest_framework_csv.renderers import CSVRenderer
 from .serializers import ChampsSerializer, BlogSerializer, MatchesSerializer
 from .serializers import FamSerializer, TotalSitSerializer
-import os
-import requests
 from django.http import HttpResponse
 from requests import RequestException
 from django.http import JsonResponse
+from rest_framework.views import APIView
 from rest_framework.renderers import BrowsableAPIRenderer
 from rest_framework.decorators import throttle_classes, permission_classes
 from rest_framework.throttling import UserRateThrottle, AnonRateThrottle
@@ -32,7 +35,6 @@ from django.core.paginator import Paginator, EmptyPage
 from .throttles import MatchesThrottle
 from rest_framework_api_key.models import APIKey
 from rest_framework_api_key.permissions import HasAPIKey
-import logging
 from django.template.loader import render_to_string
 
 
@@ -76,12 +78,13 @@ def login_view(request):
 
     return render(request, "pl/login.html")
 
+logger = logging.getLogger(__name__)
 
 @api_view(['GET'])
 @renderer_classes([TemplateHTMLRenderer, JSONRenderer, XMLRenderer, YAMLRenderer])
 @throttle_classes([AnonRateThrottle])
-@permission_classes([IsAuthenticated])
 def home(request):
+
     
 
     load_dotenv()
@@ -129,6 +132,7 @@ def home(request):
         )
 
     except Exception as e:
+        logger.error(f"The Error is: {type(e).__name__} : {e}")
 
 
         ipl = IPLMeta.objects.all()
@@ -153,6 +157,23 @@ def home(request):
 
             template_name='pl/home.html'
         )
+
+
+"""
+This class Based view is for experiment purpose 
+For production server Use function baserd view insted
+"""
+class Home(APIView):
+
+    renderer_classes = [TemplateHTMLRenderer]
+
+    
+
+    template_name = "pl/home.html"
+
+
+    def get(self, request):
+        return Response(template_name=self.template_name)
 
 
 
@@ -296,15 +317,10 @@ def email_validator(request, expiry_minutes=10, otp=random.randint(int(os.getenv
     password = data['password']
     email = data['email']
 
-    
-
-
-    
 
     app_name = "CrickWat"
     logger.error(otp)
 
-    
     
 
     html = render_to_string("email.html", {
@@ -347,14 +363,15 @@ def email_validator(request, expiry_minutes=10, otp=random.randint(int(os.getenv
                 user.set_password(password)
                 user.save()
                 del request.session['otp_data']
-                return HttpResponse('Authetication Done')
+                messages.success(request, message="OTP verifyed successfully")
+                return redirect('home')
             else:
-                return HttpResponse('not')
+                messages.error(request, message="Invaild OTP !")
 
 
         return render(request, "pl/email_otp.html", {"email_sent":email_sent})
     except Exception as e:
-        logger.error(f"Failed to send OTP email: {type(e).__name__}: {e}")
+        logger.error(f"The error is: {type(e).__name__}: {e}")
         return render(request, "pl/email_otp.html")
 
 
@@ -405,7 +422,7 @@ def blog_view(request, team_id):
 
 
 
-@api_view([ 'GET'])
+@api_view(['GET','POST'])
 @renderer_classes([TemplateHTMLRenderer, JSONRenderer, XMLRenderer, YAMLRenderer, CSVRenderer])
 def fam_view(request):
 
@@ -581,3 +598,5 @@ def generateAPIkey(request):
     return render(request, 'pl/APIKey.html')
 
 
+def check(request):
+    return HttpResponse({("Hello, World")})

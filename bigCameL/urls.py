@@ -2,11 +2,12 @@
 from django.urls import path
 from . import views
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
+from .views import Home
 
 urlpatterns = [
 
     path("login/", views.login_view, name="login"),
-    path("", views.home, name="home"),
+    path("", views.Home.as_view(), name="home"),
     path("teams/", views.team_view, name="team_view"),
     path("players/<int:team_id>/", views.player_view, name="player_view"),
     path("matches/", views.matches_view, name="match_view"),
@@ -26,5 +27,6 @@ urlpatterns = [
     path('token/refresh/html/', views.refreshJWTToken, name="refresh_tokne_html"),
     path('api/', views.generateAPIkey, name="get_api"),
     path('email-verify/', views.email_validator, name="otp"),
+    path('hello/', views.check, name="check"),
     
 ]

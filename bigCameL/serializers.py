@@ -177,8 +177,6 @@ class FamSerializer(serializers.ModelSerializer):
         return sanitize_value(value)
     def validate_title(self, value):
         return sanitize_value(value)
-    def validate_fan_image(self, value):
-        return sanitize_value(value)
     def validate_descriptions(self, value):
         return sanitize_value(value)
     class Meta:

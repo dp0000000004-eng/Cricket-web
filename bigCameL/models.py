@@ -3,7 +3,11 @@ from django.core.validators import MinValueValidator, MaxValueValidator
 from django.contrib.auth.models import User
 from embed_video.fields import EmbedVideoField
 from django.core.exceptions import ValidationError
+
+
 # Create your models here.
+
+
 
 
 class City(models.Model):
@@ -169,4 +173,11 @@ class IPLMeta(models.Model):
 
     def __str__(self):
         return f"{self.total_team} {self.total_matches} {self.total_venue}"
-    
+
+
+
+class BlockList(models.Model):
+    email = models.EmailField()
+
+    def __str__(self):
+        return f"Blocked email : {self.email}"
