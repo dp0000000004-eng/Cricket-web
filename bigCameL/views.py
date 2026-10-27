@@ -10,7 +10,7 @@ from .models import Champs, Blog, SitPrice, FanOfIPL, IPLMeta
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
 from .forms import BookingForm, UserForm, FamForm
-from django.contrib.auth.decorators import login_required
+# from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from rest_framework.renderers import TemplateHTMLRenderer, JSONRenderer
 from rest_framework.decorators import api_view, renderer_classes
@@ -123,9 +123,9 @@ def home(request):
                 # 'data':data,
                 "videos":videosSerializer.data, 
                 "ipl":metaSerializer.data,
-                "temp":Temp or None,
-                "wethr_desc":Weather or None,
-                "wind":Wind_speed or None
+                "temp":Temp,
+                "wethr_desc":Weather,
+                "wind":Wind_speed
             },
 
             template_name='pl/home.html'
