@@ -22,7 +22,7 @@
 
             <a href="{% url 'delete_fam' fam.id %}" >
                 <div class="feature-card">
-                    <img src="{{ fam.fan_image.url }}">
+                    <img src="{{ fam.fan_image }}">
                     <div>
                         <h3>{{ fam.title }}</h3>
                         <p>{{ fam.descriptions }}</p>
@@ -46,7 +46,7 @@
         <div>
             <p style="color:red; font-size:20px;">
                 ⚠️ Disclaimer: Uploads must not contain sexual images, titles, or descriptions. 
-                Violations will lead to removal and possible ban.
+                Violations will lead to removal and ban.
             </p>
         </div>
     </section>
