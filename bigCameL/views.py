@@ -425,6 +425,7 @@ def blog_view(request, team_id):
 @api_view(['GET','POST'])
 @renderer_classes([TemplateHTMLRenderer, JSONRenderer, XMLRenderer, YAMLRenderer, CSVRenderer])
 def fam_view(request):
+    is_ajax = request.headers.get("x-requested-with") == "XMLHttpRequest"
 
     if request.user.is_authenticated:
 
@@ -450,10 +451,15 @@ def fam_view(request):
                 fam = form.save(commit=False)
                 fam.username = request.user
                 fam.save()
+                if is_ajax:
+                    return JsonResponse({"message": "Upload successful."})
                 messages.success(request, "Done  ")
                 return redirect("fam")
+            if is_ajax:
+                return JsonResponse({"errors": form.errors.get_json_data()}, status=400)
         else:
             form = FamForm()
+
 
         perpage = request.query_params.get('perpage', default=3)
         page = request.query_params.get('page', default=1)
@@ -473,6 +479,8 @@ def fam_view(request):
             template_name="pl/fam.html"
         )
     else:
+        if request.method == 'POST' and is_ajax:
+            return JsonResponse({"error": "You must be logged in to upload."}, status=403)
 
         perpage = request.query_params.get('perpage', default=3)
         page = request.query_params.get('page', default=1)
