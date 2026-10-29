@@ -53,19 +53,62 @@
 
     <section class="section-form">
         <div>
-            <form method="POST" enctype="multipart/form-data">
+            <form id="uploadForm" method="POST" action="{% url 'fam' %}" enctype="multipart/form-data">
                 {% csrf_token %}
                 <lable>Email</lable><br>
-                {{ form.email }}<br>
+                <input type='email' name="email" id="email" required> <br>
                 <lable>Title</lable><br>
-                {{ form.title }}<br>
+                <input type="text" name="title" id="title"required> <br>
                 <lable>Image<small> png, jpg types allowed</small></lable><br>
-                {{ form.fan_image }}<br>
+                <input type="file" name="fan_image" id="fan_image" required> <br>
                 <lable>Description</lable><br>
-                {{ form.descriptions }}<br>
-                <input type="submit" value="Upload">
+                <input type="text" name="descriptions" id="descriptions" required> <br>
+                <button id="submitBtn" type="submit" value="Upload"></button>
             </form> 
+            <p id="status"></p>
         </div>
     </section>
+
+    <script>
+        const uploadForm = document.getElementById("uploadForm");
+        uploadForm.addEventListener("submit", async function (event) {
+            event.preventDefault();
+
+            const button = document.getElementById("submitBtn");
+            const status = document.getElementById("status");
+            const csrfToken = uploadForm.querySelector("[name=csrfmiddlewaretoken]").value;
+
+            button.disabled = true;
+            status.textContent = "Uploading...";
+
+            try {
+                const response = await fetch(uploadForm.action, {
+                    method: "POST",
+                    body: new FormData(uploadForm),
+                    headers: {
+                        "X-CSRFToken": csrfToken,
+                        "X-Requested-With": "XMLHttpRequest"
+                    }
+                });
+                const result = await response.json();
+
+                if (response.ok) {
+                    status.textContent = result.message || "Upload successful.";
+                    uploadForm.reset();
+                } else if (result.errors) {
+                    status.textContent = Object.entries(result.errors)
+                        .map(([field, errors]) => field + ": " + errors.map(error => error.message).join(", "))
+                        .join(" | ");
+                } else {
+                    status.textContent = result.error || "Upload failed (error " + response.status + ").";
+                }
+            } catch (error) {
+                status.textContent = "Upload failed. Please check your connection and try again.";
+            } finally {
+                button.disabled = false;
+            }
+            
+        });
+    </script>
 
 {% endblock %}
