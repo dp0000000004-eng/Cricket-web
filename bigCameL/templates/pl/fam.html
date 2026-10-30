@@ -7,6 +7,73 @@
 {% endblock %}
 
 {% block body %}
+<style>
+    #imageDialog {
+        position: relative;
+        width: min(90vw, 380px);
+        padding: 0;
+        border: 1px solid rgba(255, 255, 255, 0.14);
+        border-radius: 18px;
+        color: #f8fafc;
+        background: #171923;
+        box-shadow: 0 24px 70px rgba(0, 0, 0, 0.5);
+        overflow: hidden;
+    }
+
+    #imageDialog::backdrop {
+        background: rgba(8, 10, 18, 0.72);
+        backdrop-filter: blur(5px);
+    }
+
+    #dialogImagePreview {
+        display: block;
+        width: 100%;
+        max-height: 260px;
+        object-fit: cover;
+        background: #0f1118;
+    }
+
+    #imageDialog .dialog-content {
+        padding: 20px;
+    }
+
+    #imageDialog p {
+        margin: 0 0 16px;
+        font-size: 16px;
+        font-weight: 600;
+    }
+
+    #imageDialog #closeImageDialog {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        width: 36px;
+        height: 36px;
+        border: 0;
+        border-radius: 50%;
+        color: white;
+        background: rgba(0, 0, 0, 0.65);
+        font-size: 24px;
+        line-height: 1;
+        cursor: pointer;
+    }
+
+    #imageDialog #deleteImageLink {
+        display: inline-block;
+        padding: 10px 16px;
+        border-radius: 10px;
+        color: white;
+        background: #dc3545;
+        font-weight: 600;
+        text-decoration: none;
+        transition: background 150ms ease, transform 150ms ease;
+    }
+
+    #imageDialog #deleteImageLink:hover {
+        background: #bb2534;
+        transform: translateY(-1px);
+    }
+</style>
 <h1 class="greet-fam">
     {{ greetings }} {{ request.user.username }}
 </h1>
@@ -16,25 +83,19 @@
             <p>Featured</p>
             <h2>Today’s Fan’s Highlights</h2>
         </div>
-        <div class="feature-grid">
-        {% for fam in fams %}
-        
+        <div class="feature-grid" id="feature-grid" >
 
-            <a href="{% url 'delete_fam' fam.id %}" >
-                <div class="feature-card">
-                    <img src="{{ fam.fan_image }}">
-                    <div>
-                        <h3>{{ fam.title }}</h3>
-                        <p>{{ fam.descriptions }}</p>
-                    </div>
-                </div>
-            </a>
-        {% empty %}
-
-            <h2>Be The First Person To Start The Day</h2>
         
-        {% endfor %}
+        
         </div>
+        <dialog id="imageDialog">
+            <button type="button" id="closeImageDialog" aria-label="Close">×</button>
+            <img id="dialogImagePreview" alt="Selected upload preview">
+            <div class="dialog-content">
+                <p>Manage this upload</p>
+                <a id="deleteImageLink" href="#">Delete</a>
+            </div>
+        </dialog>
     </section>
     <br>
     <br>
@@ -63,7 +124,7 @@
                 <input type="file" name="fan_image" id="fan_image" required> <br>
                 <lable>Description</lable><br>
                 <input type="text" name="descriptions" id="descriptions" required> <br>
-                <button id="submitBtn" type="submit" value="Upload"></button>
+                <button id="submitBtn" type="submit" value="Upload">Save</button>
             </form> 
             <p id="status"></p>
         </div>
@@ -71,6 +132,27 @@
 
     <script>
         const uploadForm = document.getElementById("uploadForm");
+        const imgDisplay = document.getElementById("feature-grid")
+        const imageDialog = document.getElementById("imageDialog");
+        const deleteImageLink = document.getElementById("deleteImageLink");
+        const dialogImagePreview = document.getElementById("dialogImagePreview");
+
+        imgDisplay.addEventListener("click", function (event) {
+            const image = event.target.closest(".feature-card img");
+            if (!image) return;
+
+            deleteImageLink.href = image.dataset.deleteUrl;
+            dialogImagePreview.src = image.src;
+            imageDialog.showModal();
+        });
+
+        document.getElementById("closeImageDialog").addEventListener("click", function () {
+            imageDialog.close();
+        });
+
+        document.addEventListener('DOMContentLoaded', () => {
+            pageUpdate()
+        })
         uploadForm.addEventListener("submit", async function (event) {
             event.preventDefault();
 
@@ -95,6 +177,7 @@
                 if (response.ok) {
                     status.textContent = result.message || "Upload successful.";
                     uploadForm.reset();
+                    pageUpdate()
                 } else if (result.errors) {
                     status.textContent = Object.entries(result.errors)
                         .map(([field, errors]) => field + ": " + errors.map(error => error.message).join(", "))
@@ -109,6 +192,51 @@
             }
             
         });
+
+
+        
+
+        function pageUpdate() {
+            const status = document.getElementById("status");
+            const xhr = new XMLHttpRequest();
+            xhr.open("GET", uploadForm.action, true);
+            xhr.setRequestHeader("Accept", "application/json");
+
+            xhr.onload = function () {
+                if (xhr.status < 200 || xhr.status >= 300) {
+                    status.textContent = "Could not load uploads.";
+                    return;
+                }
+
+                try {
+                    const data = JSON.parse(xhr.responseText);
+                    let str = ''
+                    
+                    for (let i = 0; i < data.fams.length; i ++) {
+                        const fam = data.fams[i];
+                        str += `
+                            <div class="feature-card">
+                                <img src="${fam.fan_image}" data-delete-url="${fam.delete_url || `/delete/${fam.id}`}" alt="${fam.title}">
+                                <div>
+                                    <h3>${fam.title}</h3>
+                                    <p>${fam.descriptions}</p>
+                                </div>
+                            </div>
+                        `
+                    }
+                    imgDisplay.innerHTML = str;
+                    
+                } catch (error) {
+                    status.textContent = "The server returned an invalid response.";
+                }
+            };
+
+            xhr.onerror = function () {
+                status.textContent = "Could not load uploads. Please check your connection.";
+            };
+
+            xhr.send();
+        }
     </script>
 
 {% endblock %}

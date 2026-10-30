@@ -474,33 +474,51 @@ def fam_view(request):
             fams = []
         
         famSerializer = FamSerializer(fams, many=True)
-        return Response(
-            {"form":form, "greetings":random.choice(greetings), "fams":famSerializer.data},
-            template_name="pl/fam.html"
-        )
-    else:
-        if request.method == 'POST' and is_ajax:
-            return JsonResponse({"error": "You must be logged in to upload."}, status=403)
-
-        perpage = request.query_params.get('perpage', default=3)
-        page = request.query_params.get('page', default=1)
-
-
-        fams = FanOfIPL.objects.all()
-        paginator = Paginator( fams, per_page=perpage)
-
-        try:
-            fams = paginator.page(number=page)
-        except EmptyPage:
-            fams = []
+        if request.accepted_renderer.format == "html":
+            
+            return Response(
+                    {
+                        "form":form, 
+                        "greetings":random.choice(greetings), 
+                        "fams":famSerializer.data
+                    }, 
+                    template_name="pl/fam.html")
         
-        famSerializer = FamSerializer(fams, many=True)
-        return Response(
-            {
-                'fams':famSerializer.data
-            },
-            template_name="pl/fam.html"
-        )
+        else:
+            return Response({
+                
+                    "greetings":random.choice(greetings), 
+                    "fams":famSerializer.data
+                },
+
+                template_name="pl/fam.html"
+            )
+    else:
+        if request.method == 'GET' and is_ajax:
+            # return JsonResponse({"error": "You must be logged in to upload."}, status=403)
+
+            perpage = request.query_params.get('perpage', default=3)
+            page = request.query_params.get('page', default=1)
+
+
+            fams = FanOfIPL.objects.all()
+            paginator = Paginator( fams, per_page=perpage)
+
+            try:
+                fams = paginator.page(number=page)
+            except EmptyPage:
+                fams = []
+            
+            famSerializer = FamSerializer(fams, many=True)
+            return Response(
+                {
+                    'fams':famSerializer.data
+                },
+                template_name="pl/fam.html"
+            )
+    data = {"greetings": random.choice(greetings), "fams": famSerializer.data}
+
+    
 
 def delete_fan_data(request, fan_id):
     fan = FanOfIPL.objects.get(id=fan_id)
