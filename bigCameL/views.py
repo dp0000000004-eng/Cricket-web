@@ -524,6 +524,7 @@ def delete_fan_data(request, fan_id):
     fan = FanOfIPL.objects.get(id=fan_id)
 
     fan.delete()
+    fan.fan_image.delete(save=False)
     return redirect("fam")
 
 
