@@ -94,27 +94,33 @@
                 box-shadow: 0 0 0 4px rgba(26, 115, 232, .13);
             }
 
-            input[type="submit"] {
+            #buttonEl {
                 min-height: 50px;
                 margin-top: 14px;
                 border: 0;
-                border-radius: 12px;
-                background: #1a73e8;
-                box-shadow: 0 8px 18px rgba(26, 115, 232, .22);
+                border-radius: 14px;
+                background: linear-gradient(135deg, #287ef0, #145fc5);
+                box-shadow: 0 9px 20px rgba(26, 115, 232, .25), inset 0 1px 0 rgba(255, 255, 255, .2);
                 color: #fff;
                 cursor: pointer;
                 font: inherit;
                 font-weight: 700;
+                letter-spacing: .01em;
                 transition: background .18s ease, transform .18s ease, box-shadow .18s ease;
             }
 
-            input[type="submit"]:hover {
-                transform: translateY(-1px);
-                background: #1765cc;
-                box-shadow: 0 11px 22px rgba(26, 115, 232, .27);
+            #buttonEl:hover {
+                transform: translateY(-2px);
+                background: linear-gradient(135deg, #3689fb, #176bd5);
+                box-shadow: 0 13px 25px rgba(26, 115, 232, .3), inset 0 1px 0 rgba(255, 255, 255, .24);
             }
 
-            input[type="submit"]:focus-visible {
+            #buttonEl:active {
+                transform: translateY(0);
+                box-shadow: 0 5px 12px rgba(26, 115, 232, .22);
+            }
+
+            #buttonEl:focus-visible {
                 outline: 3px solid rgba(26, 115, 232, .35);
                 outline-offset: 3px;
             }
@@ -216,54 +222,139 @@
             <section class="card" aria-labelledby="page-title">
                 <p class="eyebrow">Matchday account</p>
                 <h1 id="page-title">Get your tokens</h1>
-                <p class="intro">Sign in with your account details to generate your authentication tokens.</p>
+                <p class="intro">Enter your refresh token to generate a new access token.</p>
 
                 <form method="POST">
                     {% csrf_token %}
-                    <label for="username">Refresh Token: </label>
-                    <input id="password" type="password" name="refresh" placeholder="Enter your refresh token" required>
-                    <input type="submit" value="Generate Access tokens">
+                    <label for="refresh">Refresh Token:</label>
+                    <input id="refresh" type="password" name="refresh" placeholder="Enter your refresh token" required>
+                    <button id="buttonEl" type="submit" value="Generate Access Token">Generate Access Token</button>
                 </form>
 
-                {% if data %}
-                    <section class="tokens" aria-label="Generated tokens">
+                    <section id="tokenDisplayEl" class="tokens" aria-label="Generated tokens">
+                        
+                        
+
+                    </section>
+            </section>
+        </main>
+        <script>
+//token/refresh
+
+            // AJAX POST request with access token
+            async function sendAjaxWithAccessToken(url) {
+                // Get access token from the page
+                const refreshTokenElem = document.getElementById('refresh');
+                const refreshToken = refreshTokenElem.value
+                const display = document.getElementById('tokenDisplayEl')
+                const button = document.getElementById('buttonEl');
+                if (!refreshToken) {
+                    alert('No access token found.');
+                    return;
+                }
+                const originalButtonText = button.textContent;
+                button.textContent = 'Fetching token…';
+                button.disabled = true;
+                button.style.opacity = '0.65';
+                button.style.cursor = 'progress';
+                try {
+                    const response = await fetch(url, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Accept': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            refresh: refreshToken,
+                        }),
+                        // credentials: 'include',
+                        // body: JSON.stringify({}) // Add payload if needed
+                    });
+
+                    
+                    const data = await response.json();
+                    if (data) {
+                        console.log(data)
+                        display.innerHTML = `
                         <div class="token">
                             <div class="token-header">
                                 <h2>Access token</h2>
                                 <button class="copy-btn" type="button" id="copy-access-token">Copy</button>
                             </div>
-                            <code>{{ data.access }}</code>
+                            <code>${data.access}</code>
                         </div>
                         
                         <p class="intro">New Access token Generated </p>
-
-                    </section>
-                {% endif %}
-            </section>
-        </main>
-        <script>
-            const copyAccessTokenButton = document.getElementById('copy-access-token');
-
-            if (copyAccessTokenButton) {
-                copyAccessTokenButton.addEventListener('click', async () => {
-                    const accessToken = copyAccessTokenButton
-                        .closest('.token')
-                        .querySelector('code')
-                        .textContent
-                        .trim();
-
-                    try {
-                        await navigator.clipboard.writeText(accessToken);
-                        copyAccessTokenButton.textContent = 'Copied!';
-                    } catch (error) {
-                        copyAccessTokenButton.textContent = 'Copy failed';
+                        `
+                    } else {
+                        console.log('somthing error')
                     }
-
-                    window.setTimeout(() => {
-                        copyAccessTokenButton.textContent = 'Copy';
-                    }, 1800);
-                });
+                } catch (err) {
+                    console.log('AJAX request failed: ' + err);
+                } finally {
+                    button.textContent = originalButtonText;
+                    button.disabled = false;
+                    button.style.opacity = '';
+                    button.style.cursor = '';
+                }
             }
+
+            // Display AJAX response in the page
+            function displayAjaxResponse(content) {
+                let respDiv = document.getElementById('ajax-response');
+                if (!respDiv) {
+                    respDiv = document.createElement('div');
+                    respDiv.id = 'ajax-response';
+                    respDiv.style.marginTop = '2em';
+                    document.querySelector('main').appendChild(respDiv);
+                }
+                respDiv.textContent = content;
+            }
+
+            // Add a button to trigger AJAX request
+            document.addEventListener('DOMContentLoaded', function() {
+                
+                const button = document.getElementById("buttonEl")
+                button.addEventListener('click', (event) => {
+                    event.preventDefault();
+                    sendAjaxWithAccessToken('/token/refresh/')
+                })
+            });
+
+            // The token markup is inserted after the response, so handle clicks on the document.
+            document.addEventListener('click', async (event) => {
+                const copyAccessTokenButton = event.target.closest('#copy-access-token');
+                if (!copyAccessTokenButton) return;
+
+                const accessToken = copyAccessTokenButton
+                    .closest('.token')
+                    .querySelector('code')
+                    .textContent
+                    .trim();
+
+                try {
+                    if (navigator.clipboard && window.isSecureContext) {
+                        await navigator.clipboard.writeText(accessToken);
+                    } else {
+                        const temporaryInput = document.createElement('textarea');
+                        temporaryInput.value = accessToken;
+                        temporaryInput.style.position = 'fixed';
+                        temporaryInput.style.opacity = '0';
+                        document.body.appendChild(temporaryInput);
+                        temporaryInput.select();
+                        const copied = document.execCommand('copy');
+                        temporaryInput.remove();
+                        if (!copied) throw new Error('Copy command failed');
+                    }
+                    copyAccessTokenButton.textContent = 'Copied!';
+                } catch (error) {
+                    copyAccessTokenButton.textContent = 'Copy failed';
+                }
+
+                window.setTimeout(() => {
+                    copyAccessTokenButton.textContent = 'Copy';
+                }, 1800);
+            });
         </script>
     </body>
 </html>

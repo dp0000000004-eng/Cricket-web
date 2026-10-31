@@ -292,7 +292,7 @@
                     const timeoutId = setTimeout(() => controller.abort(), 5000);
                     let response;
                     try {
-                        response = await fetch('http://127.0.0.1:8000/token/', {
+                        response = await fetch('/token/', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
@@ -328,6 +328,7 @@
                         const code = document.createElement('code');
                         code.textContent = value ?? '';
                         token.append(heading, code);
+                        addCopyButton(token);
                         tokenSection.append(token);
                     }
 
