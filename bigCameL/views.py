@@ -548,25 +548,7 @@ def totalSitAPIView(request):
 def getJWTToken(request):
 
 
-    if request.method == "POST":
-        username = request.POST.get('username')
-        password = request.POST.get('password')
-
-
-        try:
-            res = requests.post(
-                "http://127.0.0.1:8000/token/",
-                json={"username": username, "password": password},  # sent as JSON body
-                timeout=5,
-            )
-            res.raise_for_status()
-            data = res.json()
-
-            return render(request, 'pl/jwtToken.html', {'data':data})
-
-
-        except RequestException as e:
-            return render(request, 'pl/jwtToken.html', {"error": str(type(e).__name__)})
+    
 
     return render(request, 'pl/jwtToken.html')
 

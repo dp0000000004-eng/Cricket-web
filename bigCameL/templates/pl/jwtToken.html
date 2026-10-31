@@ -122,29 +122,41 @@
                 box-shadow: 0 0 0 4px rgba(26, 115, 232, .13);
             }
 
-            input[type="submit"] {
+            button[type="submit"] {
+                width: 100%;
                 min-height: 50px;
                 margin-top: 14px;
                 border: 0;
                 border-radius: 12px;
-                background: #1a73e8;
-                box-shadow: 0 8px 18px rgba(26, 115, 232, .22);
+                background: linear-gradient(135deg, #3186f5, #155fc4);
+                box-shadow: 0 8px 18px rgba(26, 115, 232, .24), inset 0 1px 0 rgba(255, 255, 255, .2);
                 color: #fff;
                 cursor: pointer;
                 font: inherit;
                 font-weight: 700;
-                transition: background .18s ease, transform .18s ease, box-shadow .18s ease;
+                letter-spacing: .01em;
+                transition: background .18s ease, transform .18s ease, box-shadow .18s ease, opacity .18s ease;
             }
 
-            input[type="submit"]:hover {
+            button[type="submit"]:hover:not(:disabled) {
                 transform: translateY(-1px);
-                background: #1765cc;
-                box-shadow: 0 11px 22px rgba(26, 115, 232, .27);
+                background: linear-gradient(135deg, #2678e5, #104fa9);
+                box-shadow: 0 11px 22px rgba(26, 115, 232, .3), inset 0 1px 0 rgba(255, 255, 255, .2);
             }
 
-            input[type="submit"]:focus-visible {
+            button[type="submit"]:active:not(:disabled) {
+                transform: translateY(0);
+                box-shadow: 0 4px 10px rgba(26, 115, 232, .2);
+            }
+
+            button[type="submit"]:focus-visible {
                 outline: 3px solid rgba(26, 115, 232, .35);
                 outline-offset: 3px;
+            }
+
+            button[type="submit"]:disabled {
+                cursor: wait;
+                opacity: .7;
             }
 
             .tokens {
@@ -241,7 +253,7 @@
     </head>
     <body>
         <main class="page">
-            <section class="card" aria-labelledby="page-title">
+            <section id="card" class="card" aria-labelledby="page-title">
                 <p class="eyebrow">Matchday account</p>
                 <h1 id="page-title">Get your tokens</h1>
                 <p class="intro">Sign in with your account details to generate your authentication tokens.</p>
@@ -252,34 +264,95 @@
                     <input id="username" type="text" name="username" placeholder="Enter your username" autocomplete="username" required>
                     <label for="password">Password</label>
                     <input id="password" type="password" name="password" placeholder="Enter your password" autocomplete="current-password" required>
-                    <input type="submit" value="Generate tokens">
+                    <button id="submitBtn" type="submit">Generate tokens</button>
                 </form>
 
-                {% if data %}
-                    <section class="tokens" aria-label="Generated tokens">
-                        <div class="token">
-                            <h2>Refresh token</h2>
-                            <code>{{ data.refresh }}</code>
-                        </div>
-                        <div class="token">
-                            <h2>Access token</h2>
-                            <code>{{ data.access }}</code>
-                        </div>
+                    <section id="tokens" class="tokens" aria-label="Generated tokens">
                         
-                        <p class="intro">Use access token for authentication porpose
-                            <br>The Refresh token is used for generate another Access token</p>
 
                     </section>
-                {% endif %}
-                {% if error %}
-                <p class="error-message" role="alert">
-                    {{ error }}
-                </p>
-                {% endif %}
             </section>
         </main>
         <script>
-            document.querySelectorAll('.token').forEach((token) => {
+
+            const form = document.querySelector('form');
+            const submitBtn = document.getElementById('submitBtn');
+            const cardEl = document.getElementById('tokens')
+
+            form.addEventListener('submit', async (event) => {
+                event.preventDefault();
+                const errorMessage = document.querySelector('.error-message');
+                if (errorMessage) errorMessage.remove();
+
+                submitBtn.disabled = true;
+                submitBtn.textContent = 'Generating...';
+
+                try {
+                    const controller = new AbortController();
+                    const timeoutId = setTimeout(() => controller.abort(), 5000);
+                    let response;
+                    try {
+                        response = await fetch('http://127.0.0.1:8000/token/', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Accept': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            username: form.elements.username.value,
+                            password: form.elements.password.value
+                        }),
+                        signal: controller.signal
+                        });
+                    } finally {
+                        clearTimeout(timeoutId);
+                    }
+                    const data = await response.json();
+                    if (!response.ok) {
+                        throw new Error(data.error || data.detail || `Request failed (${response.status}).`);
+                    }
+
+                    let tokenSection = document.querySelector('.tokens');
+                    if (!tokenSection) {
+                        tokenSection = document.createElement('section');
+                        tokenSection.className = 'tokens';
+                        tokenSection.setAttribute('aria-label', 'Generated tokens');
+                        form.after(tokenSection);
+                    }
+                    tokenSection.replaceChildren();
+                    for (const [label, value] of [['Refresh token', data.refresh], ['Access token', data.access]]) {
+                        const token = document.createElement('div');
+                        token.className = 'token';
+                        const heading = document.createElement('h2');
+                        heading.textContent = label;
+                        const code = document.createElement('code');
+                        code.textContent = value ?? '';
+                        token.append(heading, code);
+                        tokenSection.append(token);
+                    }
+
+                    const intro = document.createElement('p');
+                    intro.className = 'intro';
+                    intro.append('Use access token for authentication porpose', document.createElement('br'),
+                        'The Refresh token is used for generate another Access token');
+                    tokenSection.append(intro);
+
+
+                } catch (error) {
+                    const message = document.createElement('p');
+                    message.className = 'error-message';
+                    message.setAttribute('role', 'alert');
+                    message.textContent = error.name === 'AbortError'
+                        ? 'The request timed out.'
+                        : error.message || 'Unable to generate tokens.';
+                    form.after(message);
+                } finally {
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = 'Generate tokens';
+                }
+            });
+
+            function addCopyButton(token) {
                 const heading = token.querySelector('h2');
                 const code = token.querySelector('code');
                 if (!heading || !code) return;
@@ -291,10 +364,8 @@
                 button.type = 'button';
                 button.textContent = 'Copy';
                 button.setAttribute('aria-label', `Copy ${heading.textContent.trim().toLowerCase()}`);
-
                 token.insertBefore(header, heading);
                 header.append(heading, button);
-
                 button.addEventListener('click', async () => {
                     const text = code.textContent.trim();
                     try {
@@ -317,7 +388,15 @@
                     }
                     setTimeout(() => { button.textContent = 'Copy'; }, 1500);
                 });
-            });
+            }
+
+
+
+
+
+
+
+            document.querySelectorAll('.token').forEach(addCopyButton);
         </script>
     </body>
 </html>
