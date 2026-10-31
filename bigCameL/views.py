@@ -546,34 +546,10 @@ def totalSitAPIView(request):
 
 
 def getJWTToken(request):
-
-
-    
-
     return render(request, 'pl/jwtToken.html')
 
 
 def refreshJWTToken(request):
-
-    if request.method == "POST":
-        refresh_token = request.POST.get('refresh')
-
-        try:
-
-            res = requests.post(
-                "http://127.0.0.1:8000/token/refresh/",
-                json={"refresh": refresh_token},  # sent as JSON body
-                timeout=5,
-            )
-            res.raise_for_status()
-            data = res.json()
-
-            return render(request, 'pl/jwtRefresh.html', {'data':data})
-
-        except RequestException as e:
-            return JsonResponse({"error":str(type(e).__name__)}, status=502)
-
-
     return render(request, 'pl/jwtRefresh.html')
     
 
