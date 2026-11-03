@@ -292,7 +292,7 @@
                     const timeoutId = setTimeout(() => controller.abort(), 5000);
                     let response;
                     try {
-                        response = await fetch('/token/', {
+                        response = await fetch('http://127.0.0.1:8000/token/', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',

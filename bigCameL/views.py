@@ -4,10 +4,11 @@ import random
 import requests
 import logging
 from django.views import View
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, resolve_url
 from .models import Teams, Players, Matches, Venues, About_venue, TotalSit, Video
 from .models import Champs, Blog, SitPrice, FanOfIPL, IPLMeta
 from django.contrib.auth import authenticate, login, logout
+from django.utils.http import url_has_allowed_host_and_scheme
 from django.contrib import messages
 from .forms import BookingForm, UserForm, FamForm
 # from django.contrib.auth.decorators import login_required
@@ -58,25 +59,34 @@ def player_view(request, team_id):
     playersSerializer = PlayerSerializer(players, many=True)
     return Response({'players':playersSerializer.data} ,template_name="pl/players.html")
 
-
+@api_view(['GET', 'POST'])
+@renderer_classes([TemplateHTMLRenderer, JSONRenderer])
 def login_view(request):
     if request.user.is_authenticated:
         return redirect('home')
 
     if request.method == "POST":
-        username = request.POST.get('username')
-        password = request.POST.get('password')
-        user = authenticate(request, username=username, password=password)
+        user = authenticate(
+            request._request,
+            username=request.POST.get('username'),
+            password=request.POST.get('password'),
+        )
 
-        back_path = f"{request.POST.get('next') or request.GET.get('next') or 'home'}"
+        if user is None:
+            return Response(
+                {"success": False, "error": "Invalid Username or password!"},
+                status=401,
+            )
 
-        if user is not None:
-            login(request, user)
-            return redirect(back_path)
-        else:
-            messages.error(request, message="Invalid Username or password!")
+        login(request._request, user)
 
-    return render(request, "pl/login.html")
+        next_url = request.POST.get('next') or request.GET.get('next')
+        if not next_url or not url_has_allowed_host_and_scheme(next_url, allowed_hosts={request.get_host()}):
+            next_url = resolve_url('home')   # role-based logic can go here
+
+        return Response({"success": True, "redirect_url": next_url})
+
+    return Response({"msg": "hello"}, template_name="pl/login.html")
 
 logger = logging.getLogger(__name__)
 

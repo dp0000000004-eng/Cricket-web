@@ -317,7 +317,7 @@
                 const button = document.getElementById("buttonEl")
                 button.addEventListener('click', (event) => {
                     event.preventDefault();
-                    sendAjaxWithAccessToken('/token/refresh/')
+                    sendAjaxWithAccessToken('http://127.0.0.1:8000/token/refresh/')
                 })
             });
 
