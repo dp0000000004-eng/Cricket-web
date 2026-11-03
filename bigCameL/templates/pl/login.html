@@ -1,31 +1,92 @@
 {% load static %}
 
-<!DOCTYPE html>
+<!doctype html>
 <html>
-    <head>
-        <title>
-            Login
-        </title>
-        <link rel="stylesheet" href="{% static 'pl/login.css' %}">
-    </head>
-    <body>
-    {% if messages %}
-        {% for message in messages %}
-            <p>{{ message }}</p>
-        {% endfor %}
-    {% endif %}
+  <head>
+    <title>Login</title>
+    <link rel="stylesheet" href="{% static 'pl/login.css' %}" />
+  </head>
+  <body>
+    {% if messages %} {% for message in messages %}
+    <p>{{ message }}</p>
+    {% endfor %} {% endif %}
     <div class="form-c">
-        <form method="POST">
-            {% csrf_token %}
-            <input type="hidden" name="next" value="{{ request.GET.next }}">
-            <lable class="lbl-cls">Username: </lable><br>
-            <input class="input-cls" type="text" name="username" placeholder="Username"><br>
-            <lable class="lbl-cls">Password: </lable><br>
-            <input class="input-cls" type="password" name="password" placeholder="password"><br>
-            <input class="login-btn" type="submit" value="Login" ><br>
-            <h5>If not have a account create a Account by click below</h5><br>
-            <a class="signIn" href="{% url 'createAccount' %}">Sign In</a>
-        </form>
+      <form id="login-form" method="POST">
+        {% csrf_token %}
+        <input type="hidden" name="next" value="{{ request.GET.next }}" />
+        <label class="lbl-cls">Username:</label><br />
+        <input
+          class="input-cls"
+          type="text"
+          name="username"
+          placeholder="Username"
+          required
+        /><br />
+        <label class="lbl-cls">Password:</label><br />
+        <input
+          class="input-cls"
+          type="password"
+          name="password"
+          placeholder="Password"
+          required
+        /><br />
+        <p id="login-error" class="login-error" role="alert"></p>
+        <button id="login-btn" class="login-btn" type="submit">Login</button
+        ><br />
+        <h5>Don't have an account? Create one below</h5>
+        <a class="signIn" href="{% url 'createAccount' %}">Sign Up</a>
+      </form>
     </div>
+
+    <style>
+      .login-error {
+        color: #d93025;
+        min-height: 1.2em;
+        margin: 6px 0;
+        font-size: 0.9rem;
+      }
+      .login-btn:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+      }
+    </style>
+
+    <script>
+      document
+        .getElementById("login-form")
+        .addEventListener("submit", async (e) => {
+          e.preventDefault();
+          const form = e.target;
+          const btn = document.getElementById("login-btn");
+          const errBox = document.getElementById("login-error");
+
+          errBox.textContent = "";
+          btn.disabled = true;
+          btn.textContent = "Logging in...";
+
+          try {
+            const res = await fetch(window.location.href, {
+              method: "POST",
+              body: new FormData(form),
+              headers: {
+                "X-Requested-With": "XMLHttpRequest",
+                Accept: "application/json",
+              },
+            });
+            const data = await res.json();
+
+            if (res.ok && data.success) {
+              window.location.href = data.redirect_url;
+            } else {
+              errBox.textContent = data.error || "Login failed.";
+            }
+          } catch (err) {
+            errBox.textContent = "Something went wrong. Try again.";
+          } finally {
+            btn.disabled = false;
+            btn.textContent = "Login";
+          }
+        });
+    </script>
   </body>
 </html>
