@@ -1,12 +1,19 @@
-{% extends 'pl/layout.html' %} {% block title %} Book {% endblock %} {% block
-body %}
+{% extends 'pl/layout.html' %} 
+{% block title %} Book {% endblock %} 
+{% block body %}
 <h1>{{ user_data.Email_address }}</h1>
 
 <h1>{{ greet }} {{ request.user.username }}</h1>
 
-{% if messages %} {% for m in messages %}
-<p class="{{ m.tags }}">{{ m }}</p>
-{% endfor %} {% endif %} {% for available in total_available %}
+
+
+
+{% if messages %} 
+  {% for m in messages %}
+    <p class="{{ m.tags }}">{{ m }}</p>
+  {% endfor %} 
+{% endif %} 
+{% for available in total_available %}
 <h2>Total Available: {{ available.sit_available }}</h2>
 <div class="hardcore" id="vip">
   <h2>VIP sits: {{ available.vip }} Cost: ₹{{ vip_price }}</h2>
@@ -14,19 +21,82 @@ body %}
 <div class="hardcore" id="normal">
   <h2>Normal sits: {{ available.normal }} Cost: ₹{{ normal_price }}</h2>
 </div>
-{% endfor %} {% if form %} {% if messages %} {% for m in messages %}
-<p class="{{ m.tags }}">{{ m }}</p>
-{% endfor %} {% endif %}
+{% endfor %} 
+
+
+
 <form method="POST">
   {% csrf_token %}
   <div class="hardcore" id="vip">
-    <lable>{{ form.vip.label }}</lable>
-    {{ form.vip }}
+    <lable>Vip</lable>
+    <input id="vip" type="number" name="vip">
   </div>
   <div class="hardcore" id="normal">
-    <lable>{{ form.normal.label }}</lable>
-    {{ form.normal }}
+    <lable>normal</lable>
+    <input id="normal" type="number" name="normal">
   </div>
-  <input type="submit" value="Purchase" />
+  <button type="button" id="purchase-btn">Purchase</button>
+  
 </form>
-{% endif %} {% endblock %}
+
+
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const btn = document.getElementById('purchase-btn');
+  const form = btn.closest('form');
+  const vip = form.querySelector('input[name="vip"]');
+  const normal = form.querySelector('input[name="normal"]');
+  btn.addEventListener('click', function(e) {
+    e.preventDefault();
+    btn.disabled = true;
+    const originalText = btn.textContent;
+    btn.textContent = 'Loading...';
+
+    const formData = {
+      "vip": vip.value,
+      "normal": normal.value
+    };
+
+    fetch('http://127.0.0.1:8000/book/', {
+      method: 'POST',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+        'X-Requested-With': 'XMLHttpRequest',
+        'X-CSRFToken': form.querySelector('[name=csrfmiddlewaretoken]').value
+      },
+      body: JSON.stringify(formData)
+    })
+    .then(response => response.json())
+    .then(data => {
+      alert(data.msg || 'Success');
+    })
+    .catch(error => {
+      alert('An error occurred.' + error);
+    })
+    .finally(() => {
+      btn.disabled = false;
+      btn.textContent = originalText;
+      refreshData()
+    });
+
+
+  });
+
+  function refreshData() {
+    fetch('http://127.0.0.1:8000/book/', {
+      method: 'GET',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+        'X-Requested-With': 'XMLHttpRequest',
+      },
+    })
+    .then(response => response.json())
+    .then(data => response["total_available"])
+    .then(console.log(data))
+  }
+});
+</script> 
+{% endblock %}
