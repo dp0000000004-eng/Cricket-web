@@ -185,20 +185,20 @@ class FamSerializer(serializers.ModelSerializer):
 
 
 
-class TotalSitSerializer(serializers.ModelSerializer):
-    def validate_vip(self, value):
-        return sanitize_value(value)
-    def validate_normal(self, value):
-        return sanitize_value(value)
-    class Meta:
-        model = TotalSit
-        fields = ['id', 'sit_available', 'vip', 'normal']
+# class TotalSitSerializer(serializers.ModelSerializer):
+#     def validate_vip(self, value):
+#         return sanitize_value(value)
+#     def validate_normal(self, value):
+#         return sanitize_value(value)
+#     class Meta:
+#         model = TotalSit
+#         fields = ['id', 'sit_available', 'vip', 'normal']
 
-    extra_kwags = {
-        "vip":{
-            "min_value":0
-        },
-        "normal":{
-            "min_value":0
-        }
-    }
+#     extra_kwags = {
+#         "vip":{
+#             "min_value":0
+#         },
+#         "normal":{
+#             "min_value":0
+#         }
+#     }

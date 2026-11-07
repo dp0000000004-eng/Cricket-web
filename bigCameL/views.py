@@ -23,7 +23,7 @@ from .serializers import VenuesSerializer, PlayerSerializer, AboutVenueSerialize
 from rest_framework_yaml.renderers import YAMLRenderer
 from rest_framework_csv.renderers import CSVRenderer
 from .serializers import ChampsSerializer, BlogSerializer, MatchesSerializer
-from .serializers import FamSerializer, TotalSitSerializer
+from .serializers import FamSerializer
 from django.http import HttpResponse
 from requests import RequestException
 from django.http import JsonResponse
@@ -37,6 +37,7 @@ from .throttles import MatchesThrottle
 from rest_framework_api_key.models import APIKey
 from rest_framework_api_key.permissions import HasAPIKey
 from django.template.loader import render_to_string
+from .models import TotalBooked
 
 
 @api_view(['GET', 'POST'])
@@ -208,7 +209,6 @@ def about_venue(request, venue_id):
 
 @api_view(['GET'])
 @renderer_classes([TemplateHTMLRenderer, JSONRenderer, XMLRenderer, CSVRenderer])
-@permission_classes([IsAuthenticated])
 @throttle_classes([MatchesThrottle])
 def matches_view(request):
     matches = Matches.objects.all().select_related('team1', 'team2' , 'venue', 'home_of', 'city')
@@ -234,7 +234,8 @@ def venue_view(request):
         template_name="pl/venues.html"
     )
 
-
+@api_view(['GET', 'POST'])
+@renderer_classes([TemplateHTMLRenderer, JSONRenderer, XMLRenderer])
 def booking(request):
     if request.user.is_authenticated:
 
@@ -261,7 +262,7 @@ def booking(request):
 
         if sit_left == nothing_left:
             info_msg = messages.info(request, message="No sit available")
-            return render(request, "pl/book.html" , {"info_msg":info_msg})
+            return Response({"info_msg":info_msg, "greet":random.choice(greetMsg)}, template_name= "pl/book.html" )
         
 
         sit_available = TotalSit.objects.all()
@@ -269,26 +270,37 @@ def booking(request):
         if sit_left != nothing_left:
             if request.method == "POST":
 
+                # DRF exposes JSON/form payloads through request.data; Django
+                # requests expose form submissions through request.POST.
+                payload = getattr(request, "data", request.POST)
+                new_book = TotalBooked()
+                new_book.vip = int(payload.get('vip') or 0)
+                new_book.normal = int(payload.get('normal') or 0)
+                new_book.save()
 
+            if request.accepted_renderer.format == "html":
 
-                form = BookingForm(request.POST)
-                if form.is_valid():
-                    book = form.save(commit=False)
-                    book.user_data = user_data
-                    book.save()
-                    messages.success(request, message="Thank's For Booking")
-                    form = BookingForm()
-                else:
-                    form = BookingForm()
-
-        return render(request, "pl/book.html" , {
-            "form":BookingForm(request.POST), 
-            "total_available":sit_available,
-            "vip_price":vip_sit_price, 
-            "normal_price":normal_sit_price, 
-            "greet":random.choice(greetMsg), 
-            "user_data":request.user.username
-        })
+                return Response( {
+                    "form":BookingForm(request.POST), 
+                    "total_available":sit_available,
+                    "vip_price":vip_sit_price, 
+                    "normal_price":normal_sit_price, 
+                    "greet":random.choice(greetMsg), 
+                    "user_data":request.user.username,
+                }
+                ,
+                template_name="pl/book.html" )
+            else:
+                return Response(
+                    
+                    {
+                    "total_available":list(sit_available.values()),
+                    "vip_price":vip_sit_price, 
+                    "normal_price":normal_sit_price, 
+                    "greet":random.choice(greetMsg), 
+                    "user_data":request.user.username,
+                    },template_name="pl/book.html"
+                )
     else:
         return redirect("login")
 
@@ -539,20 +551,20 @@ def delete_fan_data(request, fan_id):
 
 
 
-@api_view(['GET', 'POST'])
-@renderer_classes([JSONRenderer, BrowsableAPIRenderer])
-def totalSitAPIView(request):
-    items = TotalSit.objects.all()[0]
+# @api_view(['GET', 'POST'])
+# @renderer_classes([JSONRenderer, BrowsableAPIRenderer])
+# def totalSitAPIView(request):
+#     items = TotalSit.objects.all()[0]
 
-    sitSerializer = TotalSitSerializer(items)
+#     sitSerializer = TotalSitSerializer(items)
 
-    store_data = TotalSitSerializer(data=request.data)
-    store_data.is_valid(raise_exception=True)
-    store_data.save()
+#     store_data = TotalSitSerializer(data=request.data)
+#     store_data.is_valid(raise_exception=True)
+#     store_data.save()
 
-    return Response(
-        {"items":sitSerializer.data}
-    )
+#     return Response(
+#         {"items":sitSerializer.data}
+#     )
 
 
 def getJWTToken(request):
