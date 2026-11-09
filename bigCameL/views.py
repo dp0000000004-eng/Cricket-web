@@ -272,15 +272,20 @@ def booking(request):
 
                 # DRF exposes JSON/form payloads through request.data; Django
                 # requests expose form submissions through request.POST.
+
                 payload = getattr(request, "data", request.POST)
+                if  int(payload.get('vip')) or 0  == 0 and int(payload.get('normal')) or 0 == 0:
+                    return Response({"message":messages.error(request, message="not a valid number")})
+
                 new_book = TotalBooked()
                 new_book.vip = int(payload.get('vip') or 0)
                 new_book.normal = int(payload.get('normal') or 0)
+                new_book.user_data = {"email":request.user.email, "username":request.user.username}
                 new_book.save()
 
             if request.accepted_renderer.format == "html":
 
-                return Response( {
+                return Response({
                     "form":BookingForm(request.POST), 
                     "total_available":sit_available,
                     "vip_price":vip_sit_price, 
