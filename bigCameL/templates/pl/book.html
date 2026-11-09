@@ -14,12 +14,12 @@
   {% endfor %} 
 {% endif %} 
 {% for available in total_available %}
-<h2>Total Available: {{ available.sit_available }}</h2>
+  <h2 data-seat-total>Total Available: {{ available.sit_available }}</h2>
 <div class="hardcore" id="vip">
-  <h2>VIP sits: {{ available.vip }} Cost: ₹{{ vip_price }}</h2>
+  <h2 data-vip-available data-price="{{ vip_price }}">VIP sits: {{ available.vip }} Cost: ₹{{ vip_price }}</h2>
 </div>
 <div class="hardcore" id="normal">
-  <h2>Normal sits: {{ available.normal }} Cost: ₹{{ normal_price }}</h2>
+  <h2 data-normal-available data-price="{{ normal_price }}">Normal sits: {{ available.normal }} Cost: ₹{{ normal_price }}</h2>
 </div>
 {% endfor %} 
 
@@ -39,7 +39,32 @@
   
 </form>
 
-
+<style>
+  .status-popup {
+    position: fixed;
+    top: 24px;
+    right: 24px;
+    z-index: 1000;
+    max-width: min(360px, calc(100vw - 48px));
+    padding: 14px 20px;
+    border: 1px solid transparent;
+    border-radius: 14px;
+    color: #fff;
+    font: 500 15px/1.45 system-ui, sans-serif;
+    box-shadow: 0 12px 32px rgb(15 23 42 / 20%);
+    opacity: 0;
+    transform: translateY(-12px) scale(.98);
+    transition: opacity .2s ease, transform .2s ease;
+    pointer-events: none;
+  }
+  .status-popup.is-visible { opacity: 1; transform: translateY(0) scale(1); }
+  .status-popup.is-success { background: #15803d; border-color: #4ade80; }
+  .status-popup.is-error { background: #b91c1c; border-color: #f87171; }
+  @media (prefers-reduced-motion: reduce) {
+    .status-popup { transition: none; }
+  }
+</style>
+<div id="status-popup" class="status-popup" role="status" aria-live="polite"></div>
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
@@ -47,6 +72,17 @@ document.addEventListener('DOMContentLoaded', function() {
   const form = btn.closest('form');
   const vip = form.querySelector('input[name="vip"]');
   const normal = form.querySelector('input[name="normal"]');
+  const statusPopup = document.getElementById('status-popup');
+  let statusTimer;
+
+  function showStatus(message, type) {
+    clearTimeout(statusTimer);
+    statusPopup.textContent = message;
+    statusPopup.className = `status-popup is-${type}`;
+    requestAnimationFrame(() => statusPopup.classList.add('is-visible'));
+    statusTimer = setTimeout(() => statusPopup.classList.remove('is-visible'), 3000);
+  }
+
   btn.addEventListener('click', function(e) {
     e.preventDefault();
     btn.disabled = true;
@@ -68,16 +104,22 @@ document.addEventListener('DOMContentLoaded', function() {
       },
       body: JSON.stringify(formData)
     })
-    .then(response => response.json())
+    .then(response => response.json().then(data => ({ response, data })))
     .then(data => {
-      alert(data.msg || 'Success');
+      if (data.response.ok) {
+        showStatus(data.data.msg || 'Success', 'success');
+      } else {
+        showStatus(data.data.msg || 'An error occurred.', 'error');
+      }
     })
     .catch(error => {
-      alert('An error occurred.' + error);
+      showStatus('An error occurred. ' + error.message, 'error');
     })
     .finally(() => {
       btn.disabled = false;
       btn.textContent = originalText;
+      vip.value = "";
+      normal.value = "";
       refreshData()
     });
 
@@ -85,17 +127,39 @@ document.addEventListener('DOMContentLoaded', function() {
   });
 
   function refreshData() {
-    fetch('http://127.0.0.1:8000/book/', {
+    fetch('/book/', {
       method: 'GET',
       headers: {
         'Accept': 'application/json',
-        'Content-Type': 'application/json',
         'X-Requested-With': 'XMLHttpRequest',
       },
     })
-    .then(response => response.json())
-    .then(data => response["total_available"])
-    .then(console.log(data))
+    .then(response => {
+      if (!response.ok) throw new Error('Unable to refresh availability.');
+      return response.json();
+    })
+    .then(data => {
+      const availableData = Array.isArray(data.total_available)
+        ? data.total_available[0]
+        : data.total_available;
+      if (!availableData) return;
+
+      const totalHeading = document.querySelector('[data-seat-total]');
+      const vipHeading = document.querySelector('[data-vip-available]');
+      const normalHeading = document.querySelector('[data-normal-available]');
+      if (totalHeading && availableData.sit_available !== undefined) {
+        totalHeading.textContent = `Total Available: ${availableData.sit_available}`;
+      }
+      if (vipHeading && availableData.vip !== undefined) {
+        const price = data.vip_price ?? vipHeading.dataset.price;
+        vipHeading.textContent = `VIP sits: ${availableData.vip} Cost: ₹${price}`;
+      }
+      if (normalHeading && availableData.normal !== undefined) {
+        const price = data.normal_price ?? normalHeading.dataset.price;
+        normalHeading.textContent = `Normal sits: ${availableData.normal} Cost: ₹${price}`;
+      }
+    })
+    .catch(error => console.error(error));
   }
 });
 </script> 
